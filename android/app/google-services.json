@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "813214746107",
+    "project_id": "photo-coach",
+    "storage_bucket": "photo-coach.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:813214746107:android:b7b2673599d0d191a5775e",
+        "android_client_info": {
+          "package_name": "com.example.photo_coach"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDUyoW3ms4blwtIRLHIEjC7iZ7SrWyzguA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
