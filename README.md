@@ -1,6 +1,7 @@
 # photo_coach
 
 A new Flutter project.
+CSCE 482
 
 ## Getting Started
 
