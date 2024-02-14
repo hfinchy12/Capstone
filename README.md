@@ -2,6 +2,7 @@
 
 A new Flutter project.
 CSCE 482
+Hunter F
 
 ## Getting Started
 
