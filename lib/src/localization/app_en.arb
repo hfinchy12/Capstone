@@ -1,0 +1,6 @@
+{
+  "appTitle": "photo_coach",
+  "@appTitle": {
+    "description": "The title of the application"
+  }
+}
