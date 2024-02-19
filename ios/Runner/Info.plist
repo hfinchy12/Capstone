@@ -4,6 +4,8 @@
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>We need Photos access to allow you to update Profile Picture.</string>
 	<key>CFBundleDisplayName</key>
 	<string>Photo Coach</string>
 	<key>CFBundleExecutable</key>
