@@ -2,10 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:photo_coach/category_page/category_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:open_file/open_file.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key, this.appTitle = ""});
