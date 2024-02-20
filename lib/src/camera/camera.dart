@@ -22,15 +22,13 @@ class _CameraPageState extends State<CameraPage> {
     final cameras = await availableCameras();
     final firstCamera = cameras.first;
     // Initialize the camera
-    // You can store this camera instance to use later
-    final controller = CameraController(firstCamera, ResolutionPreset.high);
+    final controller = CameraController(firstCamera, ResolutionPreset.max); //Uses best possible camera resolution
     await controller.initialize();
     return controller;
   }
 
   @override
   Widget build(BuildContext context) {
-    // Your camera UI widget
     return Scaffold(
       appBar: AppBar(
         title: Text('Camera'),
@@ -64,19 +62,18 @@ class _CameraPageState extends State<CameraPage> {
 
   Future<void> takePicture(CameraController controller) async {
     try {
-      // Ensure that the camera is initialized before attempting to take a picture
+      // ensure that the camera is initialized before attempting to take a picture
       if (!controller.value.isInitialized) {
         return;
       }
 
-      // Construct the path where the image will be saved using the path_provider package
+      // construct the path where the image will be saved using the path_provider package
       final Directory extDir = await getTemporaryDirectory();
       final String filePath = '${extDir.path}/image.jpg';
 
-      // Take the picture
+      // take the picture
       final XFile pictureFile = await controller.takePicture();
 
-      // Navigate to a new page to display the captured image
       if (pictureFile != null) {
         // Navigate to a new page to display the captured image
         Navigator.push(
