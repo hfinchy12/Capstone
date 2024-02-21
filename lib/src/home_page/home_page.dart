@@ -60,7 +60,8 @@ class _HomePageState extends State<HomePage> {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => CameraPage())); //This needs to route to "const CategoryPage()" once CategoryPage is created
+                          builder: (context) =>
+                              CameraPage())); //This needs to route to "const CategoryPage()" once CategoryPage is created
                 })));
   }
 
@@ -73,7 +74,7 @@ class _HomePageState extends State<HomePage> {
       historyPaths = prefs.getStringList(historyKey)!.toList(growable: true);
     }
 
-    historyPaths.add(imgPath);
+    historyPaths.insert(0, imgPath);
     prefs.setStringList(historyKey, historyPaths);
   }
 
@@ -85,6 +86,7 @@ class _HomePageState extends State<HomePage> {
       List<String> historyPaths =
           prefs.getStringList(historyKey)!.toList(growable: true);
       historyPaths.removeAt(index);
+      prefs.setStringList(historyKey, historyPaths);
     }
   }
 
@@ -121,6 +123,34 @@ class _HomePageState extends State<HomePage> {
       historyImages.add(Image.file(File(path)));
     }
 
-    return GridView.count(crossAxisCount: 2, children: historyImages);
+    return GridView.count(crossAxisCount: 2, children: [
+      for (int i = 0; i < historyImages.length; i++)
+        GestureDetector(
+            child: Padding(
+                padding: const EdgeInsets.all(4.0),
+                child: Card(
+                    clipBehavior: Clip.hardEdge,
+                    child:
+                        FittedBox(fit: BoxFit.fill, child: historyImages[i]))),
+            onLongPressStart: (LongPressStartDetails details) {
+              showMenu(
+                  context: context,
+                  items: [
+                    PopupMenuItem(
+                        child: TextButton(
+                            child: const Text("Delete"),
+                            onPressed: () {
+                              Navigator.pop(context); // Close showMenu popup
+                              removeHistory(i);
+                              setState(() {});
+                            }))
+                  ],
+                  position: RelativeRect.fromLTRB(
+                      details.globalPosition.dx,
+                      details.globalPosition.dy,
+                      details.globalPosition.dx,
+                      details.globalPosition.dy));
+            })
+    ]);
   }
 }
