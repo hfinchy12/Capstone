@@ -23,6 +23,10 @@ class _CameraPageState extends State<CameraPage> {
     final firstCamera = cameras.first;
     // Initialize the camera
     final controller = CameraController(firstCamera, ResolutionPreset.max); //Uses best possible camera resolution
+    // final controller = CameraController(
+    //   cameras[1], // camera![1] means front camera
+    //   ResolutionPreset.max,
+    // );
     await controller.initialize();
     return controller;
   }
@@ -50,12 +54,30 @@ class _CameraPageState extends State<CameraPage> {
           }
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          final controller = await _controllerFuture;
-          await takePicture(controller);
-        },
-        child: Icon(Icons.camera),
+      floatingActionButton: Stack(
+        alignment: Alignment.center,
+        children: [
+          Positioned(
+            bottom: 0,
+            right: 145,
+            child: SizedBox(
+              width: 70, // Adjust width according to your preference
+              height: 70, // Adjust height according to your preference
+              child: FloatingActionButton(
+                onPressed: () async {
+                  final controller = await _controllerFuture;
+                  await takePicture(controller);
+                },
+                backgroundColor: Colors.white, // Set background color to white
+                child: Icon(
+                  Icons.photo_camera,
+                  size: 35, // Adjust icon size according to your preference
+                ),
+                shape: CircleBorder(), // Make the button circular
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

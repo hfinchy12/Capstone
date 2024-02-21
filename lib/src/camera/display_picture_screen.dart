@@ -11,7 +11,7 @@ class DisplayPictureScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Display Picture')),
+      appBar: AppBar(title: Text('Retake Photo')),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -36,7 +36,13 @@ class DisplayPictureScreen extends StatelessWidget {
             onPressed: () {
               _saveAndNavigate(context);
             },
-            child: Text('Analyze'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green, // Set the button background color to green
+            ),
+            child: Text(
+              'Analyze Photo',
+              style: TextStyle(color: Colors.white), // Set the text color to white
+            ),
           ),
         ],
       ),
