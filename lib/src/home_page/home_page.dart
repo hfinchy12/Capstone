@@ -59,8 +59,7 @@ class _HomePageState extends State<HomePage> {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) =>
-                              const CategoryPage())); //This needs to route to "const CategoryPage()" once CategoryPage is created
+                          builder: (context) => const CategoryPage()));
                 })));
   }
 
@@ -69,8 +68,19 @@ class _HomePageState extends State<HomePage> {
     final XFile? pickedFile =
         await picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
-      History.appendHistory(pickedFile.path, "");
+      History.appendHistory(pickedFile.path,
+          ""); // This needs to be moved to the analysis page later
       setState(() {});
+
+      // Must be mounted to use the Navigator in an async function
+      if (!mounted) {
+        return;
+      }
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => CategoryPage(
+                  fromUpload: true, uploadImagePath: pickedFile.path)));
     }
   }
 
