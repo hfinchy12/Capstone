@@ -16,19 +16,76 @@ class _CameraPageState extends State<CameraPage> {
   void initState() {
     super.initState();
     _controllerFuture = initializeCamera();
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
+      _showPopup();
+    });
   }
+
 
   Future<CameraController> initializeCamera() async {
     final cameras = await availableCameras();
     final firstCamera = cameras.first;
-    // Initialize the camera
-    final controller = CameraController(firstCamera, ResolutionPreset.max); //Uses best possible camera resolution
-    // final controller = CameraController(
-    //   cameras[1], // camera![1] means front camera
-    //   ResolutionPreset.max,
-    // );
+    final controller = CameraController(
+      cameras[1], // camera![1] means front camera
+      ResolutionPreset.max,
+    );
     await controller.initialize();
     return controller;
+  }
+
+  Future<void> _showPopup() async {
+    final PageController _pageController = PageController();
+
+    await showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) {
+          return AlertDialog(
+            title: Text("Selfie Tips"),
+            content: SingleChildScrollView(
+              child: SizedBox(
+                height: 350, // Set a fixed height for the content area
+                width: MediaQuery.of(context).size.width * 2, // Set width to accommodate two pages
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: PageView(
+                        controller: _pageController,
+                        children: [
+                          Container(
+                            width: MediaQuery.of(context).size.width,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Good Lighting: Natural light is often the most flattering. Avoid harsh overhead lighting or direct sunlight.\n\n"
+                                      "Angle: Typically, holding the camera slightly above eye level and angling your face slightly can help accentuate your features.\n\n"
+                                      "Expression: Smile naturally or convey the mood you want to express in the selfie.\n\n"
+                                      "Framing: Center yourself in the frame or use the rule of thirds to create a visually pleasing composition.",
+                                ),
+                                // Add content for the first page here
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text("Close"),
+              ),
+            ],
+          );
+        },
+      ),
+    );
   }
 
   @override
@@ -36,6 +93,12 @@ class _CameraPageState extends State<CameraPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Camera'),
+        actions: [
+          TextButton(
+            onPressed: _showPopup,
+            child: Text('Tips', style: TextStyle(color: Colors.black)),
+          ),
+        ],
       ),
       body: FutureBuilder<CameraController>(
         future: _controllerFuture,
@@ -59,21 +122,22 @@ class _CameraPageState extends State<CameraPage> {
         children: [
           Positioned(
             bottom: 0,
-            right: 145,
+            left: 0,
+            right: 0,
             child: SizedBox(
-              width: 70, // Adjust width according to your preference
-              height: 70, // Adjust height according to your preference
+              width: 70,
+              height: 70,
               child: FloatingActionButton(
                 onPressed: () async {
                   final controller = await _controllerFuture;
                   await takePicture(controller);
                 },
-                backgroundColor: Colors.white, // Set background color to white
+                backgroundColor: Colors.white,
                 child: Icon(
                   Icons.photo_camera,
-                  size: 35, // Adjust icon size according to your preference
+                  size: 35,
                 ),
-                shape: CircleBorder(), // Make the button circular
+                shape: CircleBorder(),
               ),
             ),
           ),
@@ -82,22 +146,16 @@ class _CameraPageState extends State<CameraPage> {
     );
   }
 
+
   Future<void> takePicture(CameraController controller) async {
     try {
-      // ensure that the camera is initialized before attempting to take a picture
       if (!controller.value.isInitialized) {
         return;
       }
-
-      // construct the path where the image will be saved using the path_provider package
       final Directory extDir = await getTemporaryDirectory();
       final String filePath = '${extDir.path}/image.jpg';
-
-      // take the picture
       final XFile pictureFile = await controller.takePicture();
-
       if (pictureFile != null) {
-        // Navigate to a new page to display the captured image
         Navigator.push(
           context,
           MaterialPageRoute(

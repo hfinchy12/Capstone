@@ -25,12 +25,17 @@ class DisplayPictureScreen extends StatelessWidget {
                 } else if (snapshot.hasError) {
                   return Center(child: Text('Error loading image: ${snapshot.error.toString()}'));
                 } else if (snapshot.hasData) {
-                  return Image.file(snapshot.data!);
+                  return Transform(
+                    alignment: Alignment.center,
+                    transform: Matrix4.rotationY(180 * 3.1415927 / 180),
+                    child: Image.file(snapshot.data!),
+                  );
                 } else {
                   return Center(child: Text('Image not found'));
                 }
               },
             ),
+
           ),
           ElevatedButton(
             onPressed: () {

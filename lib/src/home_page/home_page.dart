@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'package:photo_coach/src/camera/camera.dart';
+import 'package:photo_coach/src/category_page/category_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
@@ -61,7 +62,7 @@ class _HomePageState extends State<HomePage> {
                       context,
                       MaterialPageRoute(
                           builder: (context) =>
-                              CameraPage())); //This needs to route to "const CategoryPage()" once CategoryPage is created
+                              CategoryPage())); //This needs to route to "const CategoryPage()" once CategoryPage is created
                 })));
   }
 
