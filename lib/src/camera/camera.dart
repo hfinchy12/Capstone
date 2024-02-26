@@ -1,10 +1,15 @@
-import 'dart:async';
-import 'dart:io';
-import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'dart:io';
+import 'dart:async';
 import 'package:photo_coach/src/camera/display_picture_screen.dart';
+import 'package:camera/camera.dart';
 import 'package:path_provider/path_provider.dart';
+
 class CameraPage extends StatefulWidget {
+  final String category; // Add category parameter
+
+  const CameraPage({Key? key, required this.category}) : super(key: key);
+
   @override
   _CameraPageState createState() => _CameraPageState();
 }
@@ -16,17 +21,25 @@ class _CameraPageState extends State<CameraPage> {
   void initState() {
     super.initState();
     _controllerFuture = initializeCamera();
-    WidgetsBinding.instance!.addPostFrameCallback((_) {
-      _showPopup();
-    });
   }
-
 
   Future<CameraController> initializeCamera() async {
     final cameras = await availableCameras();
-    final firstCamera = cameras.first;
+    CameraDescription selectedCamera;
+
+    // Choose camera based on the category
+    if (widget.category == 'selfie') {
+      selectedCamera = cameras.firstWhere(
+            (camera) => camera.lensDirection == CameraLensDirection.front,
+      );
+    } else {
+      selectedCamera = cameras.firstWhere(
+            (camera) => camera.lensDirection == CameraLensDirection.back,
+      );
+    }
+
     final controller = CameraController(
-      cameras[1], // camera![1] means front camera
+      selectedCamera,
       ResolutionPreset.max,
     );
     await controller.initialize();
@@ -62,8 +75,7 @@ class _CameraPageState extends State<CameraPage> {
                                       "Angle: Typically, holding the camera slightly above eye level and angling your face slightly can help accentuate your features.\n\n"
                                       "Expression: Smile naturally or convey the mood you want to express in the selfie.\n\n"
                                       "Framing: Center yourself in the frame or use the rule of thirds to create a visually pleasing composition.",
-                                ),
-                                // Add content for the first page here
+                                )
                               ],
                             ),
                           ),
@@ -88,15 +100,49 @@ class _CameraPageState extends State<CameraPage> {
     );
   }
 
+  void _toggleCamera() async {
+    final controller = await _controllerFuture;
+    CameraLensDirection newDirection = controller.description.lensDirection == CameraLensDirection.front
+        ? CameraLensDirection.back
+        : CameraLensDirection.front;
+
+    final cameras = await availableCameras();
+    CameraDescription newCamera = cameras.firstWhere(
+          (camera) => camera.lensDirection == newDirection,
+    );
+
+    // Dispose of the current controller before initializing a new one
+    await controller.dispose();
+
+    // Initialize the camera with the new camera description
+    final newController = CameraController(
+      newCamera,
+      ResolutionPreset.max,
+    );
+    await newController.initialize();
+
+    setState(() {
+      _controllerFuture = Future.value(newController);
+    });
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Camera'),
         actions: [
-          TextButton(
+          IconButton(
             onPressed: _showPopup,
-            child: Text('Tips', style: TextStyle(color: Colors.black)),
+            icon: Icon(Icons.info),
+          ),
+          IconButton(
+            onPressed: () {
+              _toggleCamera();
+              // Function to flip camera
+            },
+            icon: Icon(Icons.flip_camera_android),
           ),
         ],
       ),
@@ -146,7 +192,6 @@ class _CameraPageState extends State<CameraPage> {
     );
   }
 
-
   Future<void> takePicture(CameraController controller) async {
     try {
       if (!controller.value.isInitialized) {
@@ -159,8 +204,7 @@ class _CameraPageState extends State<CameraPage> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) =>
-                DisplayPictureScreen(imagePath: pictureFile.path),
+            builder: (context) => DisplayPictureScreen(imagePath: pictureFile.path),
           ),
         );
       } else {
