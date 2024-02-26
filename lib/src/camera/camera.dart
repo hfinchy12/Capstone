@@ -16,6 +16,8 @@ class CameraPage extends StatefulWidget {
 
 class _CameraPageState extends State<CameraPage> {
   late Future<CameraController> _controllerFuture;
+  bool _showGrid = false; // Variable to track grid visibility
+  Key _gridKey = UniqueKey(); // Unique key for the CustomPaint widget
 
   @override
   void initState() {
@@ -142,7 +144,16 @@ class _CameraPageState extends State<CameraPage> {
               _toggleCamera();
               // Function to flip camera
             },
-            icon: Icon(Icons.flip_camera_android),
+            icon: Icon(Icons.flip_camera_ios_rounded),
+          ),
+          IconButton(
+            onPressed: () {
+              setState(() {
+                _showGrid = !_showGrid; // Toggle grid visibility
+                _gridKey = UniqueKey(); // Update key to rebuild CustomPaint
+              });
+            },
+            icon: _showGrid ? Icon(Icons.grid_on) : Icon(Icons.grid_off), // Updated icon based on _showGrid
           ),
         ],
       ),
@@ -151,10 +162,16 @@ class _CameraPageState extends State<CameraPage> {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             final controller = snapshot.data!;
-            return Center(
-              child: controller.value.isInitialized
-                  ? CameraPreview(controller)
-                  : CircularProgressIndicator(),
+            return Stack(
+              children: [
+                CameraPreview(controller),
+                Positioned.fill(
+                  child: CustomPaint(
+                    key: _gridKey, // Assign key to CustomPaint
+                    painter: _showGrid ? GridPainter() : null, // Conditionally paint grid
+                  ),
+                ),
+              ],
             );
           } else {
             return Center(
@@ -192,6 +209,8 @@ class _CameraPageState extends State<CameraPage> {
     );
   }
 
+
+
   Future<void> takePicture(CameraController controller) async {
     try {
       if (!controller.value.isInitialized) {
@@ -215,3 +234,34 @@ class _CameraPageState extends State<CameraPage> {
     }
   }
 }
+
+class GridPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final Paint paint = Paint()
+      ..color = Colors.white.withOpacity(0.5) // Grid line color
+      ..strokeWidth = 2; // Grid line thickness
+
+    // Calculate cell size
+    final double cellWidth = size.width / 3;
+    final double cellHeight = size.height / 3;
+
+    // Draw vertical lines
+    for (int i = 1; i < 3; i++) {
+      final double dx = cellWidth * i;
+      canvas.drawLine(Offset(dx, 0), Offset(dx, size.height), paint);
+    }
+
+    // Draw horizontal lines
+    for (int i = 1; i < 3; i++) {
+      final double dy = cellHeight * i;
+      canvas.drawLine(Offset(0, dy), Offset(size.width, dy), paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return false;
+  }
+}
+
