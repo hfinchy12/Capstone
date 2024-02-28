@@ -1,12 +1,15 @@
 import 'dart:io';
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:photo_coach/src/analysis/analysis_page.dart';
+import 'package:camera/camera.dart';
 
 class DisplayPictureScreen extends StatelessWidget {
   final String imagePath;
+  final CameraLensDirection lensDirection; // Add lens direction parameter
 
-  const DisplayPictureScreen({Key? key, required this.imagePath}) : super(key: key);
+  const DisplayPictureScreen({Key? key, required this.imagePath, required this.lensDirection}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -26,8 +29,10 @@ class DisplayPictureScreen extends StatelessWidget {
                   return Center(child: Text('Error loading image: ${snapshot.error.toString()}'));
                 } else if (snapshot.hasData) {
                   return Transform(
-                    alignment: Alignment.center,
-                    transform: Matrix4.rotationY(180 * 3.1415927 / 180),
+                    transform: lensDirection == CameraLensDirection.front
+                        ? Matrix4.rotationY(math.pi)
+                        : Matrix4.identity(), // Apply horizontal flip only for front-facing camera
+                    alignment: FractionalOffset.center,
                     child: Image.file(snapshot.data!),
                   );
                 } else {
@@ -35,7 +40,6 @@ class DisplayPictureScreen extends StatelessWidget {
                 }
               },
             ),
-
           ),
           ElevatedButton(
             onPressed: () {
@@ -55,21 +59,16 @@ class DisplayPictureScreen extends StatelessWidget {
   }
 
   Future<File> getFile(String imagePath) async {
-    print('Image path: $imagePath'); // Print imagePath for debugging
     final file = File(imagePath);
-    print('File exists: ${await file.exists()}'); // Check if file exists
     return file;
   }
 
   Future<void> _saveAndNavigate(BuildContext context) async {
     try {
-      // Copy the image to a permanent location
       final Directory appDocDir = await getApplicationDocumentsDirectory();
       final String newImagePath = '${appDocDir.path}/image.jpg';
       final File imageFile = File(imagePath);
       await imageFile.copy(newImagePath);
-
-      // Navigate to the analysis page
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => AnalysisPage(imagePath: newImagePath)),

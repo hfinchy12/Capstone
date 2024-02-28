@@ -4,6 +4,8 @@ import 'dart:async';
 import 'package:photo_coach/src/camera/display_picture_screen.dart';
 import 'package:camera/camera.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:sensors_plus/sensors_plus.dart';
+import 'dart:math' as math; // Import math library for rotation calculations
 
 class CameraPage extends StatefulWidget {
   final String category; // Add category parameter
@@ -18,13 +20,44 @@ class _CameraPageState extends State<CameraPage> {
   late Future<CameraController> _controllerFuture;
   bool _showGrid = false; // Variable to track grid visibility
   Key _gridKey = UniqueKey(); // Unique key for the CustomPaint widget
-
+  late StreamSubscription<AccelerometerEvent> _subscription; // Subscription for sensor data
+  double _rotationAngle = 0.0; // Stores the device's rotation angle
+  late Color _levelingColor = Colors.green; // Initially set to green
   @override
   void initState() {
     super.initState();
     _controllerFuture = initializeCamera();
+    _startSensorStream();
+  }
+  void _startSensorStream() {
+    _subscription = accelerometerEvents.listen((AccelerometerEvent event) {
+      setState(() {
+        double x = event.x;
+        double y = event.y;
+        double angle = math.atan2(y, x) - math.pi / 2; // Calculate angle from accelerometer data
+        _rotationAngle = angle; // Set rotation angle
+        _updateLevelingColor(x); // Update leveling color based on accelerometer data
+      });
+    });
+
+
   }
 
+  void _updateLevelingColor(double x) {
+    if (x.abs() < 0.3) {
+      _levelingColor = Colors.green;
+    } else if (x.abs() < 1) {
+      _levelingColor = Colors.yellow;
+    } else {
+      _levelingColor = Colors.red;
+    }
+  }
+
+  @override
+  void dispose() {
+    _subscription.cancel();  // Important: Cancel subscription
+    super.dispose();
+  }
   Future<CameraController> initializeCamera() async {
     final cameras = await availableCameras();
     CameraDescription selectedCamera;
@@ -43,6 +76,7 @@ class _CameraPageState extends State<CameraPage> {
     final controller = CameraController(
       selectedCamera,
       ResolutionPreset.max,
+
     );
     await controller.initialize();
     return controller;
@@ -113,7 +147,7 @@ class _CameraPageState extends State<CameraPage> {
           (camera) => camera.lensDirection == newDirection,
     );
 
-    // Dispose of the current controller before initializing a new one
+    // Dispose of the current controller
     await controller.dispose();
 
     // Initialize the camera with the new camera description
@@ -121,13 +155,23 @@ class _CameraPageState extends State<CameraPage> {
       newCamera,
       ResolutionPreset.max,
     );
+
+    // Initialize the new camera controller
+    _controllerFuture = Future.value(newController);
     await newController.initialize();
 
-    setState(() {
-      _controllerFuture = Future.value(newController);
-    });
+    setState(() {});
   }
 
+  bool _showLevelingBar = false; // Track the visibility of the leveling bar
+
+  // Method to toggle the visibility of the leveling bar
+  void _toggleLevelingBar() {
+    setState(() {
+      _showLevelingBar = !_showLevelingBar;
+
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -155,6 +199,11 @@ class _CameraPageState extends State<CameraPage> {
             },
             icon: _showGrid ? Icon(Icons.grid_on) : Icon(Icons.grid_off), // Updated icon based on _showGrid
           ),
+          IconButton(
+            onPressed: _toggleLevelingBar,
+            icon: Icon(Icons.screen_rotation_outlined),
+
+          ),
         ],
       ),
       body: FutureBuilder<CameraController>(
@@ -171,6 +220,31 @@ class _CameraPageState extends State<CameraPage> {
                     painter: _showGrid ? GridPainter() : null, // Conditionally paint grid
                   ),
                 ),
+                Positioned(
+                left: 0,
+                right: 0,
+                bottom: MediaQuery.of(context).size.height * 0.1,
+                child: Visibility(
+                visible: _showLevelingBar,
+                child: Center(
+                    child: Transform.rotate(
+                      angle: _rotationAngle, // Apply rotation based on device's tilt
+                      child: SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.6, // Adjust width
+                        height: 10,
+                        child: Container(
+                          width: double.infinity,
+                          height: double.infinity,
+                          decoration: BoxDecoration(
+                            color: _levelingColor,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                ),
               ],
             );
           } else {
@@ -184,9 +258,9 @@ class _CameraPageState extends State<CameraPage> {
         alignment: Alignment.center,
         children: [
           Positioned(
-            bottom: 0,
+            bottom: 10,
             left: 0,
-            right: 0,
+            right: -30,
             child: SizedBox(
               width: 70,
               height: 70,
@@ -222,9 +296,7 @@ class _CameraPageState extends State<CameraPage> {
       if (pictureFile != null) {
         Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (context) => DisplayPictureScreen(imagePath: pictureFile.path),
-          ),
+          MaterialPageRoute(builder: (context) => DisplayPictureScreen(imagePath: pictureFile.path, lensDirection: controller.description.lensDirection)),
         );
       } else {
         print('Failed to take picture');
