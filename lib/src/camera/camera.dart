@@ -38,7 +38,8 @@ class _CameraPageState extends State<CameraPage> {
         double x = event.x;
         double y = event.y;
         double angle = math.atan2(y, x) - math.pi / 2; // Calculate angle from accelerometer data
-        double filteredAngle = _previousAngle * 0.9 + angle * 0.1; //low-pass filtering.
+        _previousAngle = angle;
+        double filteredAngle = _previousAngle * 0.05 + angle * 0.95; //low-pass filtering.
         _previousAngle = filteredAngle;
 
         setState(() {
@@ -53,7 +54,7 @@ class _CameraPageState extends State<CameraPage> {
   void _updateLevelingColor(double x) {
     if (x.abs() < 0.10) {
       _levelingColor = Colors.green;
-    } else if (x.abs() < .5) {
+    } else if (x.abs() < .20) {
       _levelingColor = Colors.yellow;
     } else {
       _levelingColor = Colors.red;
