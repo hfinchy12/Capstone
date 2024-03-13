@@ -22,31 +22,41 @@ class _CameraPageState extends State<CameraPage> {
   Key _gridKey = UniqueKey(); // Unique key for the CustomPaint widget
   late StreamSubscription<AccelerometerEvent> _subscription; // Subscription for sensor data
   double _rotationAngle = 0.0; // Stores the device's rotation angle
+  double _previousAngle = -999;
   late Color _levelingColor = Colors.green; // Initially set to green
   @override
   void initState() {
     super.initState();
     _controllerFuture = initializeCamera();
     _startSensorStream();
+    _showLevelingBar = false; // Set leveling bar off by default
+
   }
   void _startSensorStream() {
-    _subscription = accelerometerEvents.listen((AccelerometerEvent event) {
+    _subscription = accelerometerEvents.listen((AccelerometerEvent event) { //Try accelerometerEventStream() instead.
       setState(() {
         double x = event.x;
         double y = event.y;
         double angle = math.atan2(y, x) - math.pi / 2; // Calculate angle from accelerometer data
-        _rotationAngle = angle; // Set rotation angle
-        _updateLevelingColor(x); // Update leveling color based on accelerometer data
+        if(_previousAngle == -999){
+          _previousAngle = angle;
+        }
+        double filteredAngle = _previousAngle * 0.1 + angle * 0.90; //low-pass filtering.
+        _previousAngle = filteredAngle;
+
+        setState(() {
+          _rotationAngle = filteredAngle;
+          _updateLevelingColor(_rotationAngle); // Update based on filtered angle
+        });
       });
     });
-
 
   }
 
   void _updateLevelingColor(double x) {
-    if (x.abs() < 0.3) {
+    if (x.abs() < 0.10) {
       _levelingColor = Colors.green;
-    } else if (x.abs() < 1) {
+    } else if (x.abs() < .20) {
       _levelingColor = Colors.yellow;
     } else {
       _levelingColor = Colors.red;
@@ -221,29 +231,42 @@ class _CameraPageState extends State<CameraPage> {
                   ),
                 ),
                 Positioned(
-                left: 0,
-                right: 0,
-                bottom: MediaQuery.of(context).size.height * 0.1,
-                child: Visibility(
-                visible: _showLevelingBar,
-                child: Center(
-                    child: Transform.rotate(
-                      angle: _rotationAngle, // Apply rotation based on device's tilt
-                      child: SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.6, // Adjust width
-                        height: 10,
-                        child: Container(
-                          width: double.infinity,
-                          height: double.infinity,
-                          decoration: BoxDecoration(
-                            color: _levelingColor,
-                            borderRadius: BorderRadius.circular(10),
+                  left: 0,
+                  right: 0,
+                  bottom: MediaQuery.of(context).size.height * 0.1,
+                  child: Visibility(
+                    visible: _showLevelingBar,
+                    child: Container(
+                      height: 10,
+                      width: double.infinity,
+                      color: Colors.grey,
+                  ),
+                ),
+          ),
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: MediaQuery.of(context).size.height * 0.1,
+                  child: Visibility(
+                    visible: _showLevelingBar,
+                    child: Center(
+                      child: Transform.rotate(
+                        angle: _rotationAngle,
+                        child: SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.6,
+                          height: 10,
+                          child: Container(
+                            width: double.infinity,
+                            height: double.infinity,
+                            decoration: BoxDecoration(
+                              color: _levelingColor,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
-                ),
                 ),
               ],
             );
@@ -284,7 +307,6 @@ class _CameraPageState extends State<CameraPage> {
   }
 
 
-
   Future<void> takePicture(CameraController controller) async {
     try {
       if (!controller.value.isInitialized) {
@@ -294,6 +316,9 @@ class _CameraPageState extends State<CameraPage> {
       final String filePath = '${extDir.path}/image.jpg';
       final XFile pictureFile = await controller.takePicture();
       if (pictureFile != null) {
+        // Turn off flash after taking the picture
+        await controller.setFlashMode(FlashMode.off);
+
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => DisplayPictureScreen(imagePath: pictureFile.path, lensDirection: controller.description.lensDirection)),
@@ -305,6 +330,27 @@ class _CameraPageState extends State<CameraPage> {
       print(e);
     }
   }
+
+  // Future<void> takePicture(CameraController controller) async {
+  //   try {
+  //     if (!controller.value.isInitialized) {
+  //       return;
+  //     }
+  //     final Directory extDir = await getTemporaryDirectory();
+  //     final String filePath = '${extDir.path}/image.jpg';
+  //     final XFile pictureFile = await controller.takePicture();
+  //     if (pictureFile != null) {
+  //       Navigator.push(
+  //         context,
+  //         MaterialPageRoute(builder: (context) => DisplayPictureScreen(imagePath: pictureFile.path, lensDirection: controller.description.lensDirection)),
+  //       );
+  //     } else {
+  //       print('Failed to take picture');
+  //     }
+  //   } catch (e) {
+  //     print(e);
+  //   }
+  // }
 }
 
 class GridPainter extends CustomPainter {
