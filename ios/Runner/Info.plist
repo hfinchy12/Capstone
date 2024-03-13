@@ -4,6 +4,12 @@
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>We need Photos access to allow you to view previous photos.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>We need camera access to allow you to take photos.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>We need microphone access to allow you to take photos.</string>
 	<key>CFBundleDisplayName</key>
 	<string>Photo Coach</string>
 	<key>CFBundleExecutable</key>
