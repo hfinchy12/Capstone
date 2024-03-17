@@ -22,7 +22,7 @@ class _CameraPageState extends State<CameraPage> {
   Key _gridKey = UniqueKey(); // Unique key for the CustomPaint widget
   late StreamSubscription<AccelerometerEvent> _subscription; // Subscription for sensor data
   double _rotationAngle = 0.0; // Stores the device's rotation angle
-  double _previousAngle = 0.0;
+  double _previousAngle = -999;
   late Color _levelingColor = Colors.green; // Initially set to green
   @override
   void initState() {
@@ -38,7 +38,10 @@ class _CameraPageState extends State<CameraPage> {
         double x = event.x;
         double y = event.y;
         double angle = math.atan2(y, x) - math.pi / 2; // Calculate angle from accelerometer data
-        double filteredAngle = _previousAngle * 0.9 + angle * 0.1; //low-pass filtering.
+        if(_previousAngle == -999){
+          _previousAngle = angle;
+        }
+        double filteredAngle = _previousAngle * 0.1 + angle * 0.90; //low-pass filtering.
         _previousAngle = filteredAngle;
 
         setState(() {
@@ -53,7 +56,7 @@ class _CameraPageState extends State<CameraPage> {
   void _updateLevelingColor(double x) {
     if (x.abs() < 0.10) {
       _levelingColor = Colors.green;
-    } else if (x.abs() < .5) {
+    } else if (x.abs() < .20) {
       _levelingColor = Colors.yellow;
     } else {
       _levelingColor = Colors.red;
