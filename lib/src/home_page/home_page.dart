@@ -68,8 +68,8 @@ class _HomePageState extends State<HomePage> {
     final XFile? pickedFile =
         await picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
-      History.appendHistory(pickedFile.path,
-          ""); // This needs to be moved to the analysis page later
+      await History.append(HistoryEntry(pickedFile.path, "",
+          100)); // This needs to be moved to the analysis page later
       setState(() {});
 
       // Must be mounted to use the Navigator in an async function
@@ -94,28 +94,36 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<Widget> historyFuture() async {
-    List<String> historyPaths = await History.getHistoryPaths();
-    List<Image> historyImages = List.empty(growable: true);
-
-    for (final String path in historyPaths) {
-      historyImages.add(Image.file(File(path)));
-    }
+    List<HistoryEntry> history = await History.getHistory();
 
     return GridView.count(crossAxisCount: 2, children: [
-      for (int i = 0; i < historyImages.length; i++)
+      for (int i = 0; i < history.length; i++)
         GestureDetector(
             child: Padding(
                 padding: const EdgeInsets.all(4.0),
                 child: Card(
                     clipBehavior: Clip.hardEdge,
-                    child:
-                        FittedBox(fit: BoxFit.cover, child: historyImages[i]))),
+                    elevation: 10.0,
+                    child: Stack(fit: StackFit.passthrough, children: [
+                      FittedBox(
+                        fit: BoxFit.cover,
+                        child: Image.file(File(history[i].imgPath)),
+                      ),
+                      Container(
+                          alignment: Alignment.topRight,
+                          child: Text(history[i].overallScore.toString(),
+                              style: const TextStyle(
+                                fontSize: 20.0,
+                                color: Colors.white,
+                                backgroundColor: Colors.green,
+                              )))
+                    ]))),
             onTap: () {
               Navigator.push(
                   context,
                   MaterialPageRoute(
                       builder: (context) =>
-                          AnalysisPage(imagePath: historyPaths[i])));
+                          AnalysisPage(imagePath: history[i].imgPath)));
             },
             onLongPressStart: (LongPressStartDetails details) {
               showMenu(
@@ -124,9 +132,9 @@ class _HomePageState extends State<HomePage> {
                     PopupMenuItem(
                         child: TextButton(
                             child: const Text("Delete"),
-                            onPressed: () {
+                            onPressed: () async {
                               Navigator.pop(context); // Close showMenu popup
-                              History.removeHistory(i);
+                              await History.remove(i);
                               setState(() {});
                             }))
                   ],
