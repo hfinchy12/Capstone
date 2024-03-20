@@ -94,13 +94,41 @@ class _CameraPageState extends State<CameraPage> {
 
   Future<void> _showPopup() async {
     final PageController _pageController = PageController();
+    String popupTitle = '';
+    String popupContent = '';
+
+    if (widget.category == 'selfie') {
+      popupTitle = 'Selfie Tips';
+      popupContent = "Good Lighting: Natural light is often the most flattering. Avoid harsh overhead lighting or direct sunlight.\n\n"
+          "Angle: Typically, holding the camera slightly above eye level and angling your face slightly can help accentuate your features.\n\n"
+          "Expression: Smile naturally or convey the mood you want to express in the selfie.\n\n"
+          "Framing: Center yourself in the frame or use the rule of thirds to create a visually pleasing composition.";
+    } else if (widget.category == 'landscapes') {
+      popupTitle = 'Landscape Tips';
+      popupContent = "Use Leading Lines: Incorporate leading lines like roads, rivers, or fences to draw the viewer's eye into the scene.\n\n"
+          "Golden Hour: Shoot during the golden hour (early morning or late afternoon) for warm, soft lighting.\n\n"
+          "Foreground Interest: Include interesting foreground elements to add depth and context to your landscape.\n\n"
+          "Rule of Thirds: Use the rule of thirds to compose your shot, placing key elements along the grid lines or intersections.";
+    } else if (widget.category == 'close-up') {
+      popupTitle = 'Close-Up Tips';
+      popupContent = "Focus on Details: Get close to capture intricate details of your subject.\n\n"
+          "Experiment: Try different angles and perspectives to find unique shots.\n\n"
+          "Lighting: Soft, diffused light works best for close-ups to avoid harsh shadows.\n\n"
+          "Stability: Grip all four corners of your phone to stabilize your hands for sharp close-up shots.";
+    } else if (widget.category == 'general') {
+      popupTitle = 'General Photography Tips';
+      popupContent = "Composition: Follow the rule of thirds and use leading lines for interesting compositions.\n\n"
+          "Lighting: Understand natural light and use it to enhance your photos.\n\n"
+          "Experiment: Try different angles and perspectives to find unique shots.\n\n"
+          "Clean Backgrounds: Avoid cluttered backgrounds to keep the focus on your subject.";
+    }
 
     await showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) {
           return AlertDialog(
-            title: Text("Selfie Tips"),
+            title: Text(popupTitle),
             content: SingleChildScrollView(
               child: SizedBox(
                 height: 350, // Set a fixed height for the content area
@@ -116,12 +144,7 @@ class _CameraPageState extends State<CameraPage> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  "Good Lighting: Natural light is often the most flattering. Avoid harsh overhead lighting or direct sunlight.\n\n"
-                                      "Angle: Typically, holding the camera slightly above eye level and angling your face slightly can help accentuate your features.\n\n"
-                                      "Expression: Smile naturally or convey the mood you want to express in the selfie.\n\n"
-                                      "Framing: Center yourself in the frame or use the rule of thirds to create a visually pleasing composition.",
-                                )
+                                Text(popupContent),
                               ],
                             ),
                           ),
@@ -308,6 +331,7 @@ class _CameraPageState extends State<CameraPage> {
 
 
   Future<void> takePicture(CameraController controller) async {
+    controller.setFlashMode(FlashMode.auto);
     try {
       if (!controller.value.isInitialized) {
         return;
@@ -325,6 +349,7 @@ class _CameraPageState extends State<CameraPage> {
         );
       } else {
         print('Failed to take picture');
+
       }
     } catch (e) {
       print(e);

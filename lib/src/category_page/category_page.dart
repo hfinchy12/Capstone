@@ -34,9 +34,9 @@ class CategoryPage extends StatelessWidget {
                     fromUpload: fromUpload, // Pass the category parameter
                     uploadImagePath: uploadImagePath),
                 CategoryButton(
-                    label: 'Food',
+                    label: 'Close-Up',
                     imageAsset: 'assets/images/food.png',
-                    category: 'food', // Pass the category parameter
+                    category: 'close-up', // Pass the category parameter
                     fromUpload: fromUpload,
                     uploadImagePath: uploadImagePath),
                 CategoryButton(
@@ -46,9 +46,9 @@ class CategoryPage extends StatelessWidget {
                     fromUpload: fromUpload,
                     uploadImagePath: uploadImagePath),
                 CategoryButton(
-                    label: 'Objects',
+                    label: 'General',
                     imageAsset: 'assets/images/dog.png',
-                    category: 'objects', // Pass the category parameter
+                    category: 'general', // Pass the category parameter
                     fromUpload: fromUpload,
                     uploadImagePath: uploadImagePath),
               ],
