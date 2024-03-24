@@ -96,6 +96,7 @@ class _HomePageState extends State<HomePage> {
   Future<Widget> historyFuture() async {
     List<String> historyPaths = await History.getHistoryPaths();
     List<Image> historyImages = List.empty(growable: true);
+    List<String> historyAnalyses = await History.getHistoryAnalyses();
 
     for (final String path in historyPaths) {
       historyImages.add(Image.file(File(path)));
@@ -115,7 +116,7 @@ class _HomePageState extends State<HomePage> {
                   context,
                   MaterialPageRoute(
                       builder: (context) =>
-                          AnalysisPage(imagePath: historyPaths[i])));
+                          AnalysisPage(imagePath: historyPaths[i], responseStr: historyAnalyses[i])));
             },
             onLongPressStart: (LongPressStartDetails details) {
               showMenu(

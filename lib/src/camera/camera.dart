@@ -321,7 +321,7 @@ class _CameraPageState extends State<CameraPage> {
 
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => DisplayPictureScreen(imagePath: pictureFile.path, lensDirection: controller.description.lensDirection)),
+          MaterialPageRoute(builder: (context) => DisplayPictureScreen(imagePath: pictureFile.path, category: widget.category, lensDirection: controller.description.lensDirection)),
         );
       } else {
         print('Failed to take picture');

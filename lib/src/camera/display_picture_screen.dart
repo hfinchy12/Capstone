@@ -2,14 +2,16 @@ import 'dart:io';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:photo_coach/src/analysis/analysis_page.dart';
+import 'package:photo_coach/src/analysis/API_caller.dart';
+//import 'package:photo_coach/src/analysis/analysis_page.dart';
 import 'package:camera/camera.dart';
 
 class DisplayPictureScreen extends StatelessWidget {
   final String imagePath;
+  final String category;
   final CameraLensDirection lensDirection; // Add lens direction parameter
 
-  const DisplayPictureScreen({Key? key, required this.imagePath, required this.lensDirection}) : super(key: key);
+  const DisplayPictureScreen({Key? key, required this.imagePath, required this.category, required this.lensDirection}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +73,7 @@ class DisplayPictureScreen extends StatelessWidget {
       await imageFile.copy(newImagePath);
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => AnalysisPage(imagePath: newImagePath)),
+        MaterialPageRoute(builder: (context) => APICaller(imagePath: newImagePath, category: category,)),
       );
     } catch (e) {
       print('Error saving image and navigating: $e');
