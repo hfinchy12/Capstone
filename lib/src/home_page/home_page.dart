@@ -68,10 +68,6 @@ class _HomePageState extends State<HomePage> {
     final XFile? pickedFile =
         await picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
-      await History.append(HistoryEntry(pickedFile.path, "",
-          100)); // This needs to be moved to the analysis page later
-      setState(() {});
-
       // Must be mounted to use the Navigator in an async function
       if (!mounted) {
         return;
@@ -96,7 +92,7 @@ class _HomePageState extends State<HomePage> {
   Future<Widget> historyFuture() async {
     List<HistoryEntry> history = await History.getHistory();
 
-    return GridView.count(crossAxisCount: 2, children: [
+    return GridView.count(crossAxisCount: 3, children: [
       for (int i = 0; i < history.length; i++)
         GestureDetector(
             child: Padding(
@@ -111,19 +107,18 @@ class _HomePageState extends State<HomePage> {
                       ),
                       Container(
                           alignment: Alignment.topRight,
-                          child: Text(history[i].overallScore.toString(),
-                              style: const TextStyle(
-                                fontSize: 20.0,
-                                color: Colors.white,
-                                backgroundColor: Colors.green,
-                              )))
+                          padding: const EdgeInsets.all(5.0),
+                          child: CircleAvatar(
+                              backgroundColor: history[i].ratingColor,
+                              radius: 10.0))
                     ]))),
             onTap: () {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) =>
-                          AnalysisPage(imagePath: history[i].imgPath, responseStr: history[i].jsonAnalysis,)));
+                      builder: (context) => AnalysisPage(
+                          imgPath: history[i].imgPath,
+                          analysis: history[i].analysis)));
             },
             onLongPressStart: (LongPressStartDetails details) {
               showMenu(

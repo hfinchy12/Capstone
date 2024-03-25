@@ -2,7 +2,7 @@ import 'dart:io';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:photo_coach/src/analysis/API_caller.dart';
+import 'package:photo_coach/src/analysis/api_caller.dart';
 //import 'package:photo_coach/src/analysis/analysis_page.dart';
 import 'package:camera/camera.dart';
 
@@ -11,7 +11,12 @@ class DisplayPictureScreen extends StatelessWidget {
   final String category;
   final CameraLensDirection lensDirection; // Add lens direction parameter
 
-  const DisplayPictureScreen({Key? key, required this.imagePath, required this.category, required this.lensDirection}) : super(key: key);
+  const DisplayPictureScreen(
+      {Key? key,
+      required this.imagePath,
+      required this.category,
+      required this.lensDirection})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -28,12 +33,15 @@ class DisplayPictureScreen extends StatelessWidget {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
-                  return Center(child: Text('Error loading image: ${snapshot.error.toString()}'));
+                  return Center(
+                      child: Text(
+                          'Error loading image: ${snapshot.error.toString()}'));
                 } else if (snapshot.hasData) {
                   return Transform(
                     transform: lensDirection == CameraLensDirection.front
                         ? Matrix4.rotationY(math.pi)
-                        : Matrix4.identity(), // Apply horizontal flip only for front-facing camera
+                        : Matrix4
+                            .identity(), // Apply horizontal flip only for front-facing camera
                     alignment: FractionalOffset.center,
                     child: Image.file(snapshot.data!),
                   );
@@ -48,11 +56,13 @@ class DisplayPictureScreen extends StatelessWidget {
               _saveAndNavigate(context);
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green, // Set the button background color to green
+              backgroundColor:
+                  Colors.green, // Set the button background color to green
             ),
             child: Text(
               'Analyze Photo',
-              style: TextStyle(color: Colors.white), // Set the text color to white
+              style:
+                  TextStyle(color: Colors.white), // Set the text color to white
             ),
           ),
         ],
@@ -73,7 +83,11 @@ class DisplayPictureScreen extends StatelessWidget {
       await imageFile.copy(newImagePath);
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => APICaller(imagePath: newImagePath, category: category,)),
+        MaterialPageRoute(
+            builder: (context) => APICaller(
+                  imgPath: newImagePath,
+                  category: category,
+                )),
       );
     } catch (e) {
       print('Error saving image and navigating: $e');

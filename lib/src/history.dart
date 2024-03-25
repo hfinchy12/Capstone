@@ -1,26 +1,27 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HistoryEntry {
   String imgPath;
-  String jsonAnalysis;
-  int overallScore;
+  Map<String, dynamic> analysis;
+  Color ratingColor;
 
-  HistoryEntry(this.imgPath, this.jsonAnalysis, this.overallScore);
+  HistoryEntry(this.imgPath, this.analysis, this.ratingColor);
 
   Map toJson() {
     return {
       "imgPath": imgPath,
-      "jsonAnalysis": jsonAnalysis,
-      "overallScore": overallScore
+      "analysis": analysis,
+      "ratingColor": ratingColor.value
     };
   }
 
   HistoryEntry.fromJson(Map<String, dynamic> json)
       : imgPath = json["imgPath"] ?? "",
-        jsonAnalysis = json["jsonAnalysis"] ?? "",
-        overallScore = json["overallScore"] ?? 100;
+        analysis = json["analysis"] ?? {},
+        ratingColor = Color(json["ratingColor"] ?? Colors.black.value);
 }
 
 class History {
