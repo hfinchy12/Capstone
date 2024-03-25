@@ -53,11 +53,11 @@ class _CallerState extends State<APICaller> {
             "prompt_tokens": 466,
             "total_tokens": 621
         }
+      }
     }
-  }
   */
   Future<String> _sendPicture(String imagePath, String category) async {
-    String template = "{\"clip_result\": {\"brightness\": 0.9661136269569397,\"noisiness\": 0.9101740121841431,\"quality\": 0.9934787750244141,\"sharpness\": 0.9975830316543579},\"gpt_result\": {\"choices\": [{\"finish_reason\": \"stop\",\"index\": 0,\"message\": {\"content\": \"Brightness: Good\nClarity: Good\nOrientation: Good\n\nThis photo appears to be well-executed with a high dynamic range capturing the rich colors in the sky and the reflections on the water. The photo is clear and seems to be taken with a steady hand or a tripod, and the orientation with the pier leading into the image provides a strong composition.\n\nAdvice for improvement would depend on the artistic intent and personal preference. However, it's already a strong image. If the photographer wanted to try different looks, they could consider experimenting with different exposure times to either capture more texture in the water or create an even smoother effect. Another aspect to experiment with could be the white balance to alter the mood of the picture, making it warmer or cooler depending on the desired atmosphere.\",\"role\": \"assistant\"}}],\"created\": 1709563319,\"id\": \"chatcmpl-8z3nrwbsf96kNOvIOO4JUzbyPDM33\",\"model\": \"gpt-4-1106-vision-preview\",\"object\": \"chat.completion\",\"usage\": {\"completion_tokens\": 155,\"prompt_tokens\": 466,\"total_tokens\": 621}}}";
+    String template = "{\"clip_result\": {\"brightness\": 0.966113,\"noisiness\": 0.9101740,\"quality\": 0.99347877,\"sharpness\": 0.99758303},\"gpt_result\": {\"choices\": [{\"finish_reason\": \"stop\",\"index\": 0,\"message\": {\"content\": \"Brightness: Good\\nClarity: Good\\nOrientation: Good\\n\\nThis photo appears to be well-executed with a high dynamic range capturing the rich colors in the sky and the reflections on the water. The photo is clear and seems to be taken with a steady hand or a tripod, and the orientation with the pier leading into the image provides a strong composition.\\n\\nAdvice for improvement would depend on the artistic intent and personal preference. However, it's already a strong image. If the photographer wanted to try different looks, they could consider experimenting with different exposure times to either capture more texture in the water or create an even smoother effect. Another aspect to experiment with could be the white balance to alter the mood of the picture, making it warmer or cooler depending on the desired atmosphere.\",\"role\": \"assistant\"}}],\"created\": 1709563319,\"id\": \"chatcmpl-8z3nrwbsf96kNOvIOO4JUzbyPDM33\",\"model\": \"gpt-4-1106-vision-preview\",\"object\": \"chat.completion\",\"usage\": {\"completion_tokens\": 155,\"prompt_tokens\": 466,\"total_tokens\": 621}}}";
     try {
       final http.Response response = await http.post(
         Uri.parse('http://127.0.0.1:5000/testupload'),
@@ -73,7 +73,7 @@ class _CallerState extends State<APICaller> {
       if (response.statusCode == 200) {
         return response.body;
       } else {
-         return template;
+        return template;
       }
     } catch (e) {
       return template;

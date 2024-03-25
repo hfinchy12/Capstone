@@ -2,7 +2,7 @@ import 'dart:io';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:photo_coach/src/analysis/API_caller.dart';
+import 'package:photo_coach/src/analysis/api_caller.dart';
 //import 'package:photo_coach/src/analysis/analysis_page.dart';
 import 'package:camera/camera.dart';
 

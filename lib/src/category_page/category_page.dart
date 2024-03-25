@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:photo_coach/src/analysis/API_caller.dart';
+import 'package:photo_coach/src/analysis/api_caller.dart';
 import 'package:photo_coach/src/camera/camera.dart';
 
 class CategoryPage extends StatelessWidget {
