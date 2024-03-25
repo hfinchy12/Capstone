@@ -96,6 +96,12 @@ class _MetricBarState extends State<_MetricBar> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _expanded = false;
+  }
+
+  @override
   Widget build(BuildContext context) {
     return GestureDetector(
         onTap: () {
