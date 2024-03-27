@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'dart:async';
@@ -22,10 +24,11 @@ class _CameraPageState extends State<CameraPage> {
       _focusIndicatorPosition; // Variable to store the position of the focus indicator
   bool _showFocusIndicator =
       false; // Variable to track focus indicator visibility
-  bool _showSlider = false; // Variable to track slider visibility
   bool _showGrid = false; // Variable to track grid visibility
   Key _gridKey = UniqueKey(); // Unique key for the CustomPaint widget
   double _currentZoom = 1.0;
+  double _zoomPercentage = 1.0; // Initial zoom percentage
+  bool _isZooming = false; // Variable to track zoom gesture status
   double _maxZoom = 1.0; // Store the maximum zoom level
   late StreamSubscription<AccelerometerEvent>
       _subscription; // Subscription for sensor data
@@ -227,12 +230,6 @@ class _CameraPageState extends State<CameraPage> {
     });
   }
 
-  void _toggleZoomSlider() {
-    setState(() {
-      _showSlider = !_showSlider; // Toggle the visibility
-    });
-  }
-
   Future<void> setFocusPoint(Offset point, CameraController controller) async {
     try {
       await controller.lockCaptureOrientation();
@@ -284,6 +281,33 @@ class _CameraPageState extends State<CameraPage> {
         : SizedBox.shrink();
   }
 
+  Widget _buildZoomPercentageIndicator() {
+    return Visibility(
+      visible: _isZooming, // Show indicator only when zoom gesture is active
+      child: Positioned(
+        top: kToolbarHeight + 8, // Adjust the top position as needed
+        left: MediaQuery.of(context).size.width / 2 - 50, // Center horizontally
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.black.withOpacity(0.5),
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: Text(
+            'Zoom: ${_currentZoom.toStringAsFixed(1)}x', // Display zoom factor with one decimal place
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -315,10 +339,6 @@ class _CameraPageState extends State<CameraPage> {
             onPressed: _toggleLevelingBar,
             icon: Icon(Icons.screen_rotation_outlined),
           ),
-          IconButton(
-            onPressed: _toggleZoomSlider, // Toggle zoom slider visibility
-            icon: Icon(Icons.zoom_in_rounded),
-          ),
         ],
       ),
       body: FutureBuilder<CameraController>(
@@ -332,9 +352,43 @@ class _CameraPageState extends State<CameraPage> {
                   onTapDown: (TapDownDetails details) {
                     _handleTapToFocus(details.localPosition, controller);
                   },
+                  onScaleUpdate: (ScaleUpdateDetails details) {
+                    double zoomInScaleIncrement = 0.015; // Adjust this value for zoom in sensitivity
+                    double zoomOutScaleIncrement = 0.015; // Adjust this value for zoom out sensitivity
+
+                    double newZoom = _currentZoom * details.scale;
+
+                    // Check if the pinch gesture is zooming out (scale < 1.0) or zooming in (scale > 1.0)
+                    if (details.scale < 1.0) {
+                      newZoom = _currentZoom - zoomOutScaleIncrement;
+                    } else {
+                      newZoom = _currentZoom + zoomInScaleIncrement;
+                    }
+
+                    setState(() {
+                      _currentZoom = newZoom.clamp(1.0, _maxZoom); // Clamp zoom within limits
+                      _updateZoom(controller, _currentZoom);
+                    });
+                  },
+                  onScaleStart: (ScaleStartDetails details) {
+                    setState(() {
+                      _isZooming = true; // Zoom gesture started
+                    });
+                  },
+                  onScaleEnd: (ScaleEndDetails details) {
+
+                    Future.delayed(Duration(milliseconds: 500), () {
+                      setState(() {
+                        _isZooming = false; // Keep the zoom text visible for 200 milliseconds after the gesture ends
+                      });
+                    });
+                  },
+                  behavior: HitTestBehavior.opaque, // Ensure gesture detector handles taps and scales independently
                   child: CameraPreview(controller),
                 ),
                 _buildFocusIndicator(),
+                _buildZoomPercentageIndicator(), // Add this line to include the zoom percentage indicator
+
                 Positioned.fill(
                   child: CustomPaint(
                     key: _gridKey, // Assign key to CustomPaint
@@ -381,34 +435,6 @@ class _CameraPageState extends State<CameraPage> {
                     ),
                   ),
                 ),
-                if (_showSlider)
-                  Positioned(
-                    left: 16,
-                    right: 16,
-                    bottom: MediaQuery.of(context).size.height *
-                        0.05, // Adjust the position as needed
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Slider(
-                          value: _currentZoom,
-                          min: 1.0,
-                          max: _maxZoom,
-
-                          onChanged: (value) {
-                            setState(() {
-                              _currentZoom = value;
-                              _updateZoom(controller, value);
-                            });
-                          },
-                          divisions: ((_maxZoom - 1.0) * 10)
-                              .toInt(), // Set divisions based on the zoom range
-                          label:
-                              '${_currentZoom.toStringAsFixed(1)}x', // Display zoom label with one decimal place
-                        ),
-                      ],
-                    ),
-                  ),
               ],
             );
           } else {
@@ -472,7 +498,13 @@ class _CameraPageState extends State<CameraPage> {
 
   void _updateZoom(CameraController controller, double zoomValue) {
     controller.setZoomLevel(zoomValue);
+    setState(() {
+      _currentZoom = zoomValue;
+      _zoomPercentage = (_currentZoom / _maxZoom * 100).clamp(0, 100).toInt().toDouble(); // Update zoom percentage calculation
+    });
   }
+
+
 
 // Future<void> takePicture(CameraController controller) async {
   //   try {
