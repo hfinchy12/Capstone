@@ -25,25 +25,24 @@ class _HomePageState extends State<HomePage> {
           centerTitle: true,
         ),
         body: Column(children: [
-          Row(
-            children: [uploadButton(context), cameraButton(context)],
-          ),
+          uploadButton(context),
+          cameraButton(context),
           Expanded(child: history())
         ]));
   }
 
   Widget uploadButton(BuildContext context) {
-    return Expanded(
-        child: Container(
-            margin: const EdgeInsets.all(20.0),
-            child: IconButton(
-                icon: Image.asset("assets/images/photo_icon.png"),
-                style: IconButton.styleFrom(
-                    shape: ContinuousRectangleBorder(
-                        borderRadius: BorderRadius.circular(100.0))),
-                onPressed: () {
-                  uploadImage();
-                })));
+    return Container(
+        margin: const EdgeInsets.all(20.0),
+        child: ElevatedButton.icon(
+            icon: Image.asset("assets/images/photo_icon.png"),
+            label: const Text("Upload"),
+            style: IconButton.styleFrom(
+                shape: ContinuousRectangleBorder(
+                    borderRadius: BorderRadius.circular(100.0))),
+            onPressed: () {
+              uploadImage();
+            }));
   }
 
   Widget cameraButton(BuildContext context) {
@@ -68,10 +67,6 @@ class _HomePageState extends State<HomePage> {
     final XFile? pickedFile =
         await picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
-      History.appendHistory(pickedFile.path,
-          ""); // This needs to be moved to the analysis page later
-      setState(() {});
-
       // Must be mounted to use the Navigator in an async function
       if (!mounted) {
         return;
@@ -94,28 +89,35 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<Widget> historyFuture() async {
-    List<String> historyPaths = await History.getHistoryPaths();
-    List<Image> historyImages = List.empty(growable: true);
+    List<HistoryEntry> history = await History.getHistory();
 
-    for (final String path in historyPaths) {
-      historyImages.add(Image.file(File(path)));
-    }
-
-    return GridView.count(crossAxisCount: 2, children: [
-      for (int i = 0; i < historyImages.length; i++)
+    return GridView.count(crossAxisCount: 3, children: [
+      for (int i = 0; i < history.length; i++)
         GestureDetector(
             child: Padding(
                 padding: const EdgeInsets.all(4.0),
                 child: Card(
                     clipBehavior: Clip.hardEdge,
-                    child:
-                        FittedBox(fit: BoxFit.cover, child: historyImages[i]))),
+                    elevation: 10.0,
+                    child: Stack(fit: StackFit.passthrough, children: [
+                      FittedBox(
+                        fit: BoxFit.cover,
+                        child: Image.file(File(history[i].imgPath)),
+                      ),
+                      Container(
+                          alignment: Alignment.topRight,
+                          padding: const EdgeInsets.all(5.0),
+                          child: CircleAvatar(
+                              backgroundColor: history[i].ratingColor,
+                              radius: 10.0))
+                    ]))),
             onTap: () {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) =>
-                          AnalysisPage(imagePath: historyPaths[i])));
+                      builder: (context) => AnalysisPage(
+                          imgPath: history[i].imgPath,
+                          analysis: history[i].analysis)));
             },
             onLongPressStart: (LongPressStartDetails details) {
               showMenu(
@@ -124,9 +126,9 @@ class _HomePageState extends State<HomePage> {
                     PopupMenuItem(
                         child: TextButton(
                             child: const Text("Delete"),
-                            onPressed: () {
+                            onPressed: () async {
                               Navigator.pop(context); // Close showMenu popup
-                              History.removeHistory(i);
+                              await History.remove(i);
                               setState(() {});
                             }))
                   ],

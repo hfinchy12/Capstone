@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:photo_coach/src/analysis/analysis_page.dart';
+import 'package:photo_coach/src/analysis/api_caller.dart';
 import 'package:photo_coach/src/camera/camera.dart';
 
 class CategoryPage extends StatelessWidget {
@@ -34,9 +34,9 @@ class CategoryPage extends StatelessWidget {
                     fromUpload: fromUpload, // Pass the category parameter
                     uploadImagePath: uploadImagePath),
                 CategoryButton(
-                    label: 'Food',
+                    label: 'Close-Up',
                     imageAsset: 'assets/images/food.png',
-                    category: 'food', // Pass the category parameter
+                    category: 'close-up', // Pass the category parameter
                     fromUpload: fromUpload,
                     uploadImagePath: uploadImagePath),
                 CategoryButton(
@@ -46,9 +46,9 @@ class CategoryPage extends StatelessWidget {
                     fromUpload: fromUpload,
                     uploadImagePath: uploadImagePath),
                 CategoryButton(
-                    label: 'Objects',
+                    label: 'General',
                     imageAsset: 'assets/images/dog.png',
-                    category: 'objects', // Pass the category parameter
+                    category: 'general', // Pass the category parameter
                     fromUpload: fromUpload,
                     uploadImagePath: uploadImagePath),
               ],
@@ -83,7 +83,7 @@ class CategoryButton extends StatelessWidget {
         Navigator.push(context, MaterialPageRoute(
           builder: (context) {
             if (fromUpload) {
-              return AnalysisPage(imagePath: uploadImagePath);
+              return APICaller(imgPath: uploadImagePath, category: category);
             }
             return CameraPage(category: category);
           }, // Pass the category parameter
