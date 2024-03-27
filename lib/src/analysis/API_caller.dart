@@ -22,34 +22,24 @@ class _CallerState extends State<APICaller> {
       "http://photocoachcapstone.pythonanywhere.com/fullanalysis";
   static const Map<String, dynamic> defaultResponse = {
     "clip_result": {
-      "brightness": 1.0,
-      "noisiness": 1.0,
-      "quality": 1.0,
-      "sharpness": 1.0
+        "brightness": 0.7804979681968689,
+        "quality": 0.22963981330394745,
+        "sharpness": 0.8442980051040649
     },
-    "gpt_result": {
-      "choices": [
-        {
-          "finish_reason": "stop",
-          "index": 0,
-          "message": {
-            "content":
-                "Brightness: Good\nClarity: Good\nOrientation: Good\n\nThis photo appears to be well-executed with a high dynamic range capturing the rich colors in the sky and the reflections on the water. The photo is clear and seems to be taken with a steady hand or a tripod, and the orientation with the pier leading into the image provides a strong composition.\n\nAdvice for improvement would depend on the artistic intent and personal preference. However, it's already a strong image. If the photographer wanted to try different looks, they could consider experimenting with different exposure times to either capture more texture in the water or create an even smoother effect. Another aspect to experiment with could be the white balance to alter the mood of the picture, making it warmer or cooler depending on the desired atmosphere.",
-            "role": "assistant"
-          }
-        }
-      ],
-      "created": 1709563319,
-      "id": "chatcmpl-8z3nrwbsf96kNOvIOO4JUzbyPDM33",
-      "model": "gpt-4-1106-vision-preview",
-      "object": "chat.completion",
-      "usage": {
-        "completion_tokens": 155,
-        "prompt_tokens": 466,
-        "total_tokens": 621
-      }
-    }
+    "gpt_result": "Brightness: Good\nClarity: Fair\nSubject Focus: Poor\n\nAdvice to improve this photo:\n- Orientation: Rotate the camera to properly frame the subject.\n- Composition: Decide on a clear subject and compose the shot to emphasize it.\n- Stability: Keep the camera steady to avoid blur.\n- Cleanliness: Make sure the environment is tidy and free from distractions if that is part of the intended subject.\n- Perspective: Choose an angle that adds interest or importance to the subject."
   };
+
+  Color getColor(double score){
+    if (score < 0.3) {
+      return Colors.red; // Poor
+    } else if (score < 0.6) {
+      return Colors.yellow; // Fair
+    } else if (score < 0.8) {
+      return Colors.green[300]!; // Good
+    } else {
+      return Colors.green; // Excellent
+    }
+  }
 
   Future<Map<String, dynamic>> _sendPicture(
       String imgPath, String category) async {
@@ -73,7 +63,7 @@ class _CallerState extends State<APICaller> {
     }
 
     final HistoryEntry historyEntry = HistoryEntry(
-        imgPath, analysis, Colors.green); // TODO: calculate rating color
+        imgPath, analysis, getColor(analysis["clip_result"]["quality"]));
     History.append(historyEntry);
 
     return analysis;

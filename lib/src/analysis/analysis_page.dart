@@ -28,24 +28,24 @@ class AnalysisPage extends StatelessWidget {
       children: <Widget>[
         _MetricBar(
             title: "Brightness: ",
-            rating: analysis["clip_result"]["brightness"].toString(),
+            rating: getRating(analysis["clip_result"]["brightness"]),
             explanation: "How bright the pic is"),
         const Divider(),
         _MetricBar(
             title: "Quality: ",
-            rating: analysis["clip_result"]["quality"].toString(),
+            rating: getRating(analysis["clip_result"]["quality"]),
             explanation: "How good the pic is"),
         const Divider(),
         _MetricBar(
             title: "Sharpness: ",
-            rating: analysis["clip_result"]["sharpness"].toString(),
+            rating: getRating(analysis["clip_result"]["sharpness"]),
             explanation: "How sharp the pic is"),
         const Divider(),
         Expanded(
             child: Container(
                 color: Colors.grey[200],
                 child: Text(
-                    analysis['gpt_result']['choices'][0]['message']['content'],
+                    analysis['gpt_result'],
                     textAlign: TextAlign.left)))
       ],
     ));
