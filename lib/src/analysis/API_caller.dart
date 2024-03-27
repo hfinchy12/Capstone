@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_coach/src/analysis/analysis_page.dart';
@@ -7,8 +9,7 @@ class APICaller extends StatefulWidget {
   final String imgPath;
   final String category;
 
-  const APICaller({Key? key, required this.imgPath, required this.category})
-      : super(key: key);
+  const APICaller({super.key, required this.imgPath, required this.category});
 
   @override
   State<APICaller> createState() => _CallerState();
@@ -17,7 +18,8 @@ class APICaller extends StatefulWidget {
 class _CallerState extends State<APICaller> {
   late Future<Map<String, dynamic>> responseFuture;
 
-  static const String url = "http://10.0.2.2:5000/clipanalysis";
+  static const String url =
+      "http://photocoachcapstone.pythonanywhere.com/fullanalysis";
   static const Map<String, dynamic> defaultResponse = {
     "clip_result": {
       "brightness": 1.0,
@@ -60,10 +62,13 @@ class _CallerState extends State<APICaller> {
         "comp_level": 2
       });
       BaseOptions options =
-          BaseOptions(connectTimeout: const Duration(seconds: 5));
+          BaseOptions(connectTimeout: const Duration(seconds: 360));
       final response = await Dio(options).post(url, data: formData);
+
+      log("${response.statusCode} ${response.statusMessage ?? ""}");
       analysis = response.statusCode == 200 ? response.data : defaultResponse;
     } catch (e) {
+      log(e.toString());
       analysis = defaultResponse;
     }
 

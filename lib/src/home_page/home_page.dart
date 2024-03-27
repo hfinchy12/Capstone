@@ -25,25 +25,24 @@ class _HomePageState extends State<HomePage> {
           centerTitle: true,
         ),
         body: Column(children: [
-          Row(
-            children: [uploadButton(context), cameraButton(context)],
-          ),
+          uploadButton(context),
+          cameraButton(context),
           Expanded(child: history())
         ]));
   }
 
   Widget uploadButton(BuildContext context) {
-    return Expanded(
-        child: Container(
-            margin: const EdgeInsets.all(20.0),
-            child: IconButton(
-                icon: Image.asset("assets/images/photo_icon.png"),
-                style: IconButton.styleFrom(
-                    shape: ContinuousRectangleBorder(
-                        borderRadius: BorderRadius.circular(100.0))),
-                onPressed: () {
-                  uploadImage();
-                })));
+    return Container(
+        margin: const EdgeInsets.all(20.0),
+        child: ElevatedButton.icon(
+            icon: Image.asset("assets/images/photo_icon.png"),
+            label: const Text("Upload"),
+            style: IconButton.styleFrom(
+                shape: ContinuousRectangleBorder(
+                    borderRadius: BorderRadius.circular(100.0))),
+            onPressed: () {
+              uploadImage();
+            }));
   }
 
   Widget cameraButton(BuildContext context) {
