@@ -24,42 +24,47 @@ class _HomePageState extends State<HomePage> {
           title: Text(widget.appTitle),
           centerTitle: true,
         ),
-        body: Column(children: [
+        body: SingleChildScrollView(
+            child: Column(children: [
           uploadButton(context),
           cameraButton(context),
-          Expanded(child: history())
-        ]));
+          history()
+        ])));
   }
 
   Widget uploadButton(BuildContext context) {
     return Container(
-        margin: const EdgeInsets.all(20.0),
+        width: 500.0,
+        height: 100.0,
+        margin: const EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 20.0),
         child: ElevatedButton.icon(
-            icon: Image.asset("assets/images/photo_icon.png"),
-            label: const Text("Upload"),
+            icon: Image.asset("assets/images/photo_ico.png"),
+            label: const Text("Upload Photo", style: TextStyle(fontSize: 30.0)),
             style: IconButton.styleFrom(
                 shape: ContinuousRectangleBorder(
-                    borderRadius: BorderRadius.circular(100.0))),
+                    borderRadius: BorderRadius.circular(20.0))),
             onPressed: () {
               uploadImage();
             }));
   }
 
   Widget cameraButton(BuildContext context) {
-    return Expanded(
-        child: Container(
-            margin: const EdgeInsets.all(20.0),
-            child: IconButton(
-                icon: Image.asset("assets/images/camera_icon.png"),
-                style: IconButton.styleFrom(
-                    shape: ContinuousRectangleBorder(
-                        borderRadius: BorderRadius.circular(100.0))),
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const CategoryPage()));
-                })));
+    return Container(
+        width: 500.0,
+        height: 100.0,
+        margin: const EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 20.0),
+        child: ElevatedButton.icon(
+            icon: Image.asset("assets/images/camera_ico.png"),
+            label: const Text("Take Photo", style: TextStyle(fontSize: 30.0)),
+            style: IconButton.styleFrom(
+                shape: ContinuousRectangleBorder(
+                    borderRadius: BorderRadius.circular(20.0))),
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const CategoryPage()));
+            }));
   }
 
   void uploadImage() async {
@@ -91,7 +96,8 @@ class _HomePageState extends State<HomePage> {
   Future<Widget> historyFuture() async {
     List<HistoryEntry> history = await History.getHistory();
 
-    return GridView.count(crossAxisCount: 3, children: [
+    return GridView
+        .count(crossAxisCount: 3, primary: false, shrinkWrap: true, children: [
       for (int i = 0; i < history.length; i++)
         GestureDetector(
             child: Padding(
