@@ -39,7 +39,7 @@ class _HomePageState extends State<HomePage> {
         margin: const EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 20.0),
         child: ElevatedButton.icon(
             icon: Image.asset("assets/images/photo_ico.png"),
-            label: const Text("Upload Photo", style: TextStyle(fontSize: 30.0)),
+            label: const Text("Upload Photo", style: TextStyle(fontSize: 24.0)),
             style: IconButton.styleFrom(
                 shape: ContinuousRectangleBorder(
                     borderRadius: BorderRadius.circular(20.0))),
@@ -55,7 +55,7 @@ class _HomePageState extends State<HomePage> {
         margin: const EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 20.0),
         child: ElevatedButton.icon(
             icon: Image.asset("assets/images/camera_ico.png"),
-            label: const Text("Take Photo", style: TextStyle(fontSize: 30.0)),
+            label: const Text("Take Photo", style: TextStyle(fontSize: 24.0)),
             style: IconButton.styleFrom(
                 shape: ContinuousRectangleBorder(
                     borderRadius: BorderRadius.circular(20.0))),
