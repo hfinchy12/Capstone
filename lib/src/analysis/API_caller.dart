@@ -91,7 +91,9 @@ class _CallerState extends State<APICaller> {
                             imgPath: widget.imgPath,
                             analysis: snapshot.data!)));
               }
-              return const CircularProgressIndicator();
+              return Center(
+                child: CircularProgressIndicator(),
+              );
             }));
   }
 }
