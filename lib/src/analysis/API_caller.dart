@@ -93,7 +93,9 @@ class _CallerState extends State<APICaller> {
                               analysis: snapshot.data!)));
                 });
               }
-              return const CircularProgressIndicator();
+              return Center(
+                child: CircularProgressIndicator(),
+              );
             }));
   }
 }
