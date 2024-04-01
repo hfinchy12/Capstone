@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
-
+import 'package:photo_coach/src/home_page/home_page.dart';
 String getRating(double score) {
   if (score < 0.3) {
     return 'Poor';
@@ -56,7 +56,19 @@ class AnalysisPage extends StatelessWidget {
     return Scaffold(
         appBar: AppBar(
           title: const Text('Analysis Results'),
+          leading: IconButton(
+            icon: Icon(Icons.home),
+            onPressed: () {
+              print('Home button pressed'); // Add this line
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const HomePage()),
+              );
+              print('Navigation executed'); // Add this line
+            },
+          ),
         ),
+
         body: Column(children: <Widget>[
           SizedBox(
               height: 200,
