@@ -59,12 +59,10 @@ class AnalysisPage extends StatelessWidget {
           leading: IconButton(
             icon: Icon(Icons.home),
             onPressed: () {
-              print('Home button pressed'); // Add this line
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (context) => const HomePage()),
               );
-              print('Navigation executed'); // Add this line
             },
           ),
         ),
