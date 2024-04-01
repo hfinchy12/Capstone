@@ -44,31 +44,62 @@ class _CameraPageState extends State<CameraPage> {
     _showLevelingBar = false; // Set leveling bar off by default
   }
 
+  // void _startSensorStream() {
+  //   _subscription = accelerometerEvents.listen((AccelerometerEvent event) {
+  //     setState(() {
+  //       double x = event.x;
+  //       double y = event.y;
+  //       double angle = math.atan2(y, x) -
+  //           math.pi / 2; // Calculate angle from accelerometer data
+  //       if (_previousAngle == -999) {
+  //         _previousAngle = angle;
+  //       }
+  //       double filteredAngle =
+  //           _previousAngle * 0.1 + angle * 0.90; //low-pass filtering.
+  //       _previousAngle = filteredAngle;
+  //
+  //       setState(() {
+  //         _rotationAngle = filteredAngle;
+  //         _updateLevelingColor(
+  //             _rotationAngle); // Update based on filtered angle
+  //       });
+  //     });
+  //   });
+  // }
   void _startSensorStream() {
     _subscription = accelerometerEvents.listen((AccelerometerEvent event) {
       setState(() {
-        double x = event.x;
-        double y = event.y;
-        double angle = math.atan2(y, x) -
-            math.pi / 2; // Calculate angle from accelerometer data
-        if (_previousAngle == -999) {
-          _previousAngle = angle;
-        }
-        double filteredAngle =
-            _previousAngle * 0.1 + angle * 0.90; //low-pass filtering.
-        _previousAngle = filteredAngle;
+      double x = event.x;
+      double y = event.y;
 
-        setState(() {
-          _rotationAngle = filteredAngle;
-          _updateLevelingColor(
-              _rotationAngle); // Update based on filtered angle
-        });
+      // Calculate the tilt angle relative to the horizon
+      double angle = -math.atan2(y, x);
+
+      // Adjust angle based on device orientation and invert the tilt for the leveling bar
+      angle += math.pi / 2; // Add pi/2 to invert the tilt direction
+      if (_previousAngle == -999) {
+        _previousAngle = angle;
+      }
+      double filteredAngle =
+          _previousAngle * 0.1 + angle * 0.90; //low-pass filtering.
+      _previousAngle = filteredAngle;
+      // Update leveling color based on the adjusted angle
+      _updateLevelingColor(angle);
+
+      setState(() {
+        _rotationAngle = filteredAngle;
+        _updateLevelingColor(
+            _rotationAngle); // Update based on filtered angle
+      });
       });
     });
   }
 
+
+
+
   void _updateLevelingColor(double x) {
-    if (x.abs() < 0.10) {
+    if (x.abs() < 0.05) {
       _levelingColor = Colors.green;
     } else if (x.abs() < .20) {
       _levelingColor = Colors.yellow;
@@ -253,10 +284,8 @@ class _CameraPageState extends State<CameraPage> {
       _showFocusIndicator = true; // Show the focus indicator after delay
     });
 
-    // Delay to display focus indicator for a certain duration (optional)
     await Future.delayed(
         Duration(milliseconds: 500));
-    // Hide the focus indicator after a certain duration (optional)
     setState(() {
       _showFocusIndicator =
           false; // Hide the focus indicator after a certain duration
