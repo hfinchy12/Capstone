@@ -1,5 +1,4 @@
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'dart:async';
@@ -30,6 +29,7 @@ class _CameraPageState extends State<CameraPage> {
   double _zoomPercentage = 1.0; // Initial zoom percentage
   bool _isZooming = false; // Variable to track zoom gesture status
   double _maxZoom = 1.0; // Store the maximum zoom level
+  FlashMode _flashMode = FlashMode.off;
   late StreamSubscription<AccelerometerEvent>
       _subscription; // Subscription for sensor data
   double _rotationAngle = 0.0; // Stores the device's rotation angle
@@ -46,7 +46,6 @@ class _CameraPageState extends State<CameraPage> {
 
   void _startSensorStream() {
     _subscription = accelerometerEvents.listen((AccelerometerEvent event) {
-      //Try accelerometerEventStream() instead.
       setState(() {
         double x = event.x;
         double y = event.y;
@@ -264,6 +263,8 @@ class _CameraPageState extends State<CameraPage> {
     });
   }
 
+
+
   Widget _buildFocusIndicator() {
     return _showFocusIndicator && _focusIndicatorPosition != null
         ? Positioned(
@@ -338,6 +339,54 @@ class _CameraPageState extends State<CameraPage> {
           IconButton(
             onPressed: _toggleLevelingBar,
             icon: Icon(Icons.screen_rotation_outlined),
+          ),
+          IconButton(
+            onPressed: () async {
+              final controller = await _controllerFuture;
+
+              setState(() {
+                switch (_flashMode) {
+                  case FlashMode.off:
+                    _flashMode = FlashMode.torch;
+                    break;
+                  case FlashMode.torch:
+                    _flashMode = FlashMode.auto;
+                    break;
+                  case FlashMode.auto:
+                    _flashMode = FlashMode.off; // Change to 'off' instead of 'on'
+                    break;
+                  default:
+                    _flashMode = FlashMode.off;
+                    break;
+                }
+              });
+
+              // Update flash mode directly in CameraController
+              controller.setFlashMode(_flashMode);
+            },
+            icon: Builder(
+              builder: (context) {
+                IconData icon;
+                switch (_flashMode) {
+                  case FlashMode.off:
+                    icon = Icons.flash_off;
+                    break;
+                  case FlashMode.torch:
+                    icon = Icons.flash_on;
+                    break;
+                  case FlashMode.auto:
+                    icon = Icons.flash_auto;
+                    break;
+                  case FlashMode.always:
+                    icon = Icons.flash_on;
+                    break;
+                  default:
+                    icon = Icons.flash_off;
+                    break;
+                }
+                return Icon(icon);
+              },
+            ),
           ),
         ],
       ),
@@ -435,6 +484,7 @@ class _CameraPageState extends State<CameraPage> {
                     ),
                   ),
                 ),
+
               ],
             );
           } else {
@@ -444,31 +494,19 @@ class _CameraPageState extends State<CameraPage> {
           }
         },
       ),
-      floatingActionButton: Stack(
-        alignment: Alignment.center,
-        children: [
-          Positioned(
-            bottom: 10,
-            left: 0,
-            right: -30,
-            child: SizedBox(
-              width: 70,
-              height: 70,
-              child: FloatingActionButton(
-                onPressed: () async {
-                  final controller = await _controllerFuture;
-                  await takePicture(controller);
-                },
-                backgroundColor: Colors.white,
-                child: Icon(
-                  Icons.photo_camera,
-                  size: 35,
-                ),
-                shape: CircleBorder(),
-              ),
-            ),
-          ),
-        ],
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          final controller = await _controllerFuture;
+          await takePicture(controller);
+        },
+        backgroundColor: Colors.white,
+        child: Icon(
+          Icons.photo_camera,
+          size: 40,
+          color: Colors.black, // Set the color of the camera logo here
+        ),
+        shape: CircleBorder(),
       ),
     );
   }
@@ -481,13 +519,17 @@ class _CameraPageState extends State<CameraPage> {
 
       final Directory extDir = await getTemporaryDirectory();
       final String filePath = '${extDir.path}/image.jpg';
-
       final XFile pictureFile = await controller.takePicture();
       if (pictureFile != null) {
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => DisplayPictureScreen(imagePath: pictureFile.path, category: widget.category, lensDirection: controller.description.lensDirection)),
         );
+        // Turn off the flash after capturing the photo
+        await controller.setFlashMode(FlashMode.off);
+        setState(() {
+          _flashMode = FlashMode.off; // Update the flash mode state
+        });
       } else {
         print('Failed to take picture');
       }
@@ -503,29 +545,6 @@ class _CameraPageState extends State<CameraPage> {
       _zoomPercentage = (_currentZoom / _maxZoom * 100).clamp(0, 100).toInt().toDouble(); // Update zoom percentage calculation
     });
   }
-
-
-
-// Future<void> takePicture(CameraController controller) async {
-  //   try {
-  //     if (!controller.value.isInitialized) {
-  //       return;
-  //     }
-  //     final Directory extDir = await getTemporaryDirectory();
-  //     final String filePath = '${extDir.path}/image.jpg';
-  //     final XFile pictureFile = await controller.takePicture();
-  //     if (pictureFile != null) {
-  //       Navigator.push(
-  //         context,
-  //         MaterialPageRoute(builder: (context) => DisplayPictureScreen(imagePath: pictureFile.path, lensDirection: controller.description.lensDirection)),
-  //       );
-  //     } else {
-  //       print('Failed to take picture');
-  //     }
-  //   } catch (e) {
-  //     print(e);
-  //   }
-  // }
 }
 
 class GridPainter extends CustomPainter {
