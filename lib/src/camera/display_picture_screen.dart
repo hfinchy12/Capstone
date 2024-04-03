@@ -79,7 +79,7 @@ class DisplayPictureScreen extends StatelessWidget {
   Future<void> _saveAndNavigate(BuildContext context) async {
     try {
       final Directory appDocDir = await getApplicationDocumentsDirectory();
-      final String newImagePath = "${appDocDir.path}/${const Uuid().v1()}";
+      final String newImagePath = "${appDocDir.path}/${const Uuid().v1()}.jpg";
       File imgFile = File(imagePath);
       await imgFile.copy(newImagePath);
       imgFile.delete();

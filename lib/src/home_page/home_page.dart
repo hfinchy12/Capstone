@@ -75,7 +75,7 @@ class _HomePageState extends State<HomePage> {
         await picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       final Directory appDocDir = await getApplicationDocumentsDirectory();
-      final String newImgPath = "${appDocDir.path}/${const Uuid().v1()}";
+      final String newImgPath = "${appDocDir.path}/${const Uuid().v1()}.jpg";
       File imgFile = File(pickedFile.path);
       await imgFile.copy(newImgPath);
       imgFile.delete();
