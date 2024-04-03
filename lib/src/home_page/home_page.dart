@@ -2,10 +2,12 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:photo_coach/src/analysis/analysis_page.dart';
 
 import 'package:photo_coach/src/category_page/category_page.dart';
 import 'package:photo_coach/src/history.dart';
+import 'package:uuid/uuid.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key, this.appTitle = ""});
@@ -72,15 +74,20 @@ class _HomePageState extends State<HomePage> {
     final XFile? pickedFile =
         await picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
-      // Must be mounted to use the Navigator in an async function
+      final Directory appDocDir = await getApplicationDocumentsDirectory();
+      final String newImgPath = "${appDocDir.path}/${const Uuid().v1()}";
+      File imgFile = File(pickedFile.path);
+      await imgFile.copy(newImgPath);
+      imgFile.delete();
+
       if (!mounted) {
         return;
       }
       Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => CategoryPage(
-                  fromUpload: true, uploadImagePath: pickedFile.path)));
+              builder: (context) =>
+                  CategoryPage(fromUpload: true, uploadImagePath: newImgPath)));
     }
   }
 
