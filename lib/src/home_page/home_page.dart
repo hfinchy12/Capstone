@@ -122,8 +122,10 @@ class _HomePageState extends State<HomePage> {
                   context,
                   MaterialPageRoute(
                       builder: (context) => AnalysisPage(
-                          imgPath: history[i].imgPath,
-                          analysis: history[i].analysis)));
+                            imgPath: history[i].imgPath,
+                            analysis: history[i].analysis,
+                            historyIndex: i,
+                          )));
             },
             onLongPressStart: (LongPressStartDetails details) {
               showMenu(

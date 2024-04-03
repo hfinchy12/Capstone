@@ -1,6 +1,10 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:photo_coach/src/history.dart';
 import 'dart:io';
 import 'package:photo_coach/src/home_page/home_page.dart';
+
 String getRating(double score) {
   if (score < 0.3) {
     return 'Poor';
@@ -16,39 +20,68 @@ String getRating(double score) {
 class AnalysisPage extends StatelessWidget {
   final String imgPath;
   final Map<String, dynamic> analysis;
+  final int historyIndex;
 
   const AnalysisPage(
-      {super.key, required this.imgPath, required this.analysis});
+      {super.key,
+      required this.imgPath,
+      required this.analysis,
+      required this.historyIndex});
 
   Widget _addMetrics(Map<String, dynamic> analysis) {
-    print(analysis);
-    return Expanded(
-        child: ListView(
-      padding: const EdgeInsets.all(8),
-      children: <Widget>[
-        _MetricBar(
-            title: "Brightness: ",
-            rating: getRating(analysis["clip_result"]["brightness"]),
-            explanation: "How bright the pic is"),
-        const Divider(),
-        _MetricBar(
-            title: "Quality: ",
-            rating: getRating(analysis["clip_result"]["quality"]),
-            explanation: "How good the pic is"),
-        const Divider(),
-        _MetricBar(
-            title: "Sharpness: ",
-            rating: getRating(analysis["clip_result"]["sharpness"]),
-            explanation: "How sharp the pic is"),
-        const Divider(),
-        Expanded(
-            child: Container(
-                color: Colors.grey[200],
-                child: Text(
-                    analysis['gpt_result'],
-                    textAlign: TextAlign.left)))
-      ],
-    ));
+    log(analysis.toString());
+    return ListView(
+        primary: false,
+        shrinkWrap: true,
+        padding: const EdgeInsets.all(8),
+        children: <Widget>[
+          _MetricBar(
+              title: "Brightness: ",
+              rating: getRating(analysis["clip_result"]["brightness"]),
+              explanation: "How bright the pic is"),
+          const Divider(),
+          _MetricBar(
+              title: "Quality: ",
+              rating: getRating(analysis["clip_result"]["quality"]),
+              explanation: "How good the pic is"),
+          const Divider(),
+          _MetricBar(
+              title: "Sharpness: ",
+              rating: getRating(analysis["clip_result"]["sharpness"]),
+              explanation: "How sharp the pic is"),
+          const Divider(),
+          Container(
+              color: Colors.grey[200],
+              child: Text(analysis['gpt_result'], textAlign: TextAlign.left))
+        ]);
+  }
+
+  Widget _deleteButton(BuildContext context) {
+    return Container(
+        width: 250.0,
+        height: 50.0,
+        margin: const EdgeInsets.fromLTRB(5.0, 0.0, 5.0, 5.0),
+        child: ElevatedButton.icon(
+            icon: Image.asset("assets/images/delete_ico.png"),
+            label: const Text("Delete",
+                style: TextStyle(fontSize: 24.0, color: Colors.white)),
+            style: IconButton.styleFrom(
+              shape: ContinuousRectangleBorder(
+                  borderRadius: BorderRadius.circular(20.0)),
+              backgroundColor: Colors.red,
+            ),
+            onPressed: () async {
+              await History.remove(historyIndex);
+
+              if (!context.mounted) {
+                return;
+              }
+
+              Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => const HomePage()),
+                  (Route<dynamic> route) => false);
+            }));
   }
 
   @override
@@ -57,16 +90,15 @@ class AnalysisPage extends StatelessWidget {
         appBar: AppBar(
           title: const Text('Analysis Results'),
           leading: IconButton(
-            icon: Icon(Icons.home),
+            icon: const Icon(Icons.home),
             onPressed: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => const HomePage()),
-              );
+              Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => const HomePage()),
+                  (Route<dynamic> route) => false);
             },
           ),
         ),
-
         body: Column(children: <Widget>[
           SizedBox(
               height: 200,
@@ -75,7 +107,13 @@ class AnalysisPage extends StatelessWidget {
                   elevation: 0.0,
                   child: Image.file(File(imgPath)))),
           const Divider(),
-          _addMetrics(analysis)
+          Expanded(
+              child: SingleChildScrollView(
+                  child: Column(children: [
+            _addMetrics(analysis),
+            const Divider(),
+            _deleteButton(context)
+          ])))
         ]));
   }
 }

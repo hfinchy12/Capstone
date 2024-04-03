@@ -90,10 +90,13 @@ class _CallerState extends State<APICaller> {
                       MaterialPageRoute(
                           builder: (_) => AnalysisPage(
                               imgPath: widget.imgPath,
-                              analysis: snapshot.data!)));
+                              analysis: snapshot.data!,
+                              historyIndex:
+                                  0 // Always 0 because it was just appended and append adds it to the front
+                              )));
                 });
               }
-              return Center(
+              return const Center(
                 child: CircularProgressIndicator(),
               );
             }));
