@@ -71,16 +71,35 @@ class AnalysisPage extends StatelessWidget {
               backgroundColor: Colors.red,
             ),
             onPressed: () async {
-              await History.remove(historyIndex);
+              showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                          title: const Text("Delete Analysis"),
+                          content: const Text(
+                              "Would you like to delete this photo analysis result?"),
+                          actions: [
+                            TextButton(
+                              child: const Text("Cancel"),
+                              onPressed: () => Navigator.pop(context),
+                            ),
+                            TextButton(
+                              child: const Text("Delete",
+                                  selectionColor: Colors.red),
+                              onPressed: () async {
+                                await History.remove(historyIndex);
 
-              if (!context.mounted) {
-                return;
-              }
+                                if (!context.mounted) {
+                                  return;
+                                }
 
-              Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (context) => const HomePage()),
-                  (Route<dynamic> route) => false);
+                                Navigator.pushAndRemoveUntil(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => const HomePage()),
+                                    (Route<dynamic> route) => false);
+                              },
+                            ),
+                          ]));
             }));
   }
 
