@@ -96,56 +96,62 @@ class _HomePageState extends State<HomePage> {
   Future<Widget> historyFuture() async {
     List<HistoryEntry> history = await History.getHistory();
 
-    return GridView
-        .count(crossAxisCount: 3, primary: false, shrinkWrap: true, children: [
-      for (int i = 0; i < history.length; i++)
-        GestureDetector(
-            child: Padding(
-                padding: const EdgeInsets.all(4.0),
-                child: Card(
-                    clipBehavior: Clip.hardEdge,
-                    elevation: 10.0,
-                    child: Stack(fit: StackFit.passthrough, children: [
-                      FittedBox(
-                        fit: BoxFit.cover,
-                        child: Image.file(File(history[i].imgPath)),
-                      ),
-                      Container(
-                          alignment: Alignment.topRight,
-                          padding: const EdgeInsets.all(5.0),
-                          child: CircleAvatar(
-                              backgroundColor: history[i].ratingColor,
-                              radius: 10.0))
-                    ]))),
-            onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => AnalysisPage(
-                            imgPath: history[i].imgPath,
-                            analysis: history[i].analysis,
-                            historyIndex: i,
-                          )));
-            },
-            onLongPressStart: (LongPressStartDetails details) {
-              showMenu(
-                  context: context,
-                  items: [
-                    PopupMenuItem(
-                        child: TextButton(
-                            child: const Text("Delete"),
-                            onPressed: () async {
-                              Navigator.pop(context); // Close showMenu popup
-                              await History.remove(i);
-                              setState(() {});
-                            }))
-                  ],
-                  position: RelativeRect.fromLTRB(
-                      details.globalPosition.dx,
-                      details.globalPosition.dy,
-                      details.globalPosition.dx,
-                      details.globalPosition.dy));
-            })
-    ]);
+    return GridView.count(
+        crossAxisCount: 3,
+        primary: false,
+        shrinkWrap: true,
+        children: [
+          for (int i = 0; i < history.length; i++)
+            GestureDetector(
+                child: Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: Card(
+                        clipBehavior: Clip.hardEdge,
+                        elevation: 10.0,
+                        child: Stack(fit: StackFit.passthrough, children: [
+                          FittedBox(
+                            fit: BoxFit.cover,
+                            child: Image.file(File(history[i].imgPath)),
+                          ),
+                          Container(
+                              alignment: Alignment.topRight,
+                              padding: const EdgeInsets.all(5.0),
+                              child: CircleAvatar(
+                                  backgroundColor: history[i].ratingColor,
+                                  radius: 10.0))
+                        ]))),
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => AnalysisPage(
+                                imgPath: history[i].imgPath,
+                                analysis: history[i].analysis,
+                                historyIndex: i,
+                              )));
+                },
+                onLongPressStart: (LongPressStartDetails details) {
+                  showMenu(
+                      context: context,
+                      items: [
+                        PopupMenuItem(
+                            child: Center(
+                                child: TextButton(
+                                    child: const Text("Delete",
+                                        style: TextStyle(color: Colors.red)),
+                                    onPressed: () async {
+                                      Navigator.pop(
+                                          context); // Close showMenu popup
+                                      await History.remove(i);
+                                      setState(() {});
+                                    })))
+                      ],
+                      position: RelativeRect.fromLTRB(
+                          details.globalPosition.dx,
+                          details.globalPosition.dy,
+                          details.globalPosition.dx,
+                          details.globalPosition.dy));
+                })
+        ]);
   }
 }

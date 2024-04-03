@@ -84,7 +84,7 @@ class AnalysisPage extends StatelessWidget {
                             ),
                             TextButton(
                               child: const Text("Delete",
-                                  selectionColor: Colors.red),
+                                  style: TextStyle(color: Colors.red)),
                               onPressed: () async {
                                 await History.remove(historyIndex);
 
