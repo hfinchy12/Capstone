@@ -1,11 +1,12 @@
 import 'dart:developer';
-
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter/material.dart';
+//import 'package:photo_coach/src/analysis/API_caller.dart';
 import 'package:photo_coach/src/history.dart';
 import 'dart:io';
 import 'package:photo_coach/src/home_page/home_page.dart';
 
-String getRating(double score) {
+String _getRating(double score) {
   if (score < 0.3) {
     return 'Poor';
   } else if (score < 0.6) {
@@ -16,6 +17,20 @@ String getRating(double score) {
     return 'Excellent';
   }
 }
+
+Color _getColor(String rating) {
+    if (rating == "Poor") {
+      return Colors.red; // Poor
+    } else if (rating == "Fair") {
+      return Colors.yellow; // Fair
+    } else if (rating == "Good") {
+      return Colors.green[300]!; // Good
+    } else if (rating == "Excellent") {
+      return Colors.green; // Excellent
+    } else {
+      return Colors.black; // Error
+    }
+  }
 
 class AnalysisPage extends StatelessWidget {
   final String imgPath;
@@ -33,25 +48,28 @@ class AnalysisPage extends StatelessWidget {
     return ListView(
         primary: false,
         shrinkWrap: true,
-        padding: const EdgeInsets.all(8),
+        padding: const EdgeInsets.all(4),
         children: <Widget>[
           _MetricBar(
               title: "Brightness: ",
-              rating: getRating(analysis["clip_result"]["brightness"]),
-              explanation: "How bright the pic is"),
-          const Divider(),
+              rating: _getRating(analysis["clip_result"]["brightness"]),
+              explanation: "Brightness refers to the amount of light in the photo. An adequate brightness level ensures that objects in the photo can be seen clearly."),
+          //const Divider(),
           _MetricBar(
               title: "Quality: ",
-              rating: getRating(analysis["clip_result"]["quality"]),
-              explanation: "How good the pic is"),
-          const Divider(),
+              rating: _getRating(analysis["clip_result"]["quality"]),
+              explanation: "This refers to the overall quality of the photo and its composition."),
+          //const Divider(),
           _MetricBar(
               title: "Sharpness: ",
-              rating: getRating(analysis["clip_result"]["sharpness"]),
-              explanation: "How sharp the pic is"),
+              rating: _getRating(analysis["clip_result"]["sharpness"]),
+              explanation: "Sharpness refers to how distinct and clear the objects in the photo are. Moving the camera while taking the photo blurs the image, which lowers the sharpness."),
           const Divider(),
           Container(
-              color: Colors.grey[200],
+              padding: const EdgeInsets.all(16.0),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.black),
+              ),
               child: Text(analysis['gpt_result'], textAlign: TextAlign.left))
         ]);
   }
@@ -154,17 +172,51 @@ class _MetricBar extends StatefulWidget {
 }
 
 class _MetricBarState extends State<_MetricBar> {
-  bool _expanded = false;
+  //bool _expanded = false;
 
   @override
   void initState() {
     super.initState();
-    _expanded = false;
+    //_expanded = false;
   }
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return ExpansionTile(
+      // Adapted from https://stackoverflow.com/a/55778274
+      title: RichText(
+        text: TextSpan(
+          text: widget.title,
+          style: const TextStyle(color: Colors.black),
+          children: <TextSpan>[
+            TextSpan(
+              text: widget.rating, 
+              style: TextStyle(color: _getColor(widget.rating))
+            ),
+          ],
+        ),
+      ),
+      subtitle: SizedBox(
+        height: 3.0,
+        width: MediaQuery.of(context).size.width,
+        child: Container(
+          height: double.infinity,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+              colors: [Colors.red, Colors.yellow, Colors.green[300]!, Colors.green]
+            )
+          ),
+        ),
+      ),
+      children: <Widget>[
+        Text(widget.explanation)
+      ],
+    );
+    
+    /* return GestureDetector(
         onTap: () {
           setState(() {
             _expanded = !_expanded;
@@ -195,6 +247,6 @@ class _MetricBarState extends State<_MetricBar> {
                               fontSize: 18.0,
                               fontWeight: FontWeight.bold,
                             )),
-                      ])));
+                      ]))); */
   }
 }
