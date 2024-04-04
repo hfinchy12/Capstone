@@ -84,14 +84,21 @@ class _CallerState extends State<APICaller> {
             builder: (BuildContext context,
                 AsyncSnapshot<Map<String, dynamic>> snapshot) {
               if (snapshot.connectionState == ConnectionState.done) {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => AnalysisPage(
-                            imgPath: widget.imgPath,
-                            analysis: snapshot.data!)));
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => AnalysisPage(
+                              imgPath: widget.imgPath,
+                              analysis: snapshot.data!,
+                              historyIndex:
+                                  0 // Always 0 because it was just appended and append adds it to the front
+                              )));
+                });
               }
-              return const CircularProgressIndicator();
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
             }));
   }
 }

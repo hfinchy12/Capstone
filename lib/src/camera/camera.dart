@@ -44,31 +44,62 @@ class _CameraPageState extends State<CameraPage> {
     _showLevelingBar = false; // Set leveling bar off by default
   }
 
+  // void _startSensorStream() {
+  //   _subscription = accelerometerEvents.listen((AccelerometerEvent event) {
+  //     setState(() {
+  //       double x = event.x;
+  //       double y = event.y;
+  //       double angle = math.atan2(y, x) -
+  //           math.pi / 2; // Calculate angle from accelerometer data
+  //       if (_previousAngle == -999) {
+  //         _previousAngle = angle;
+  //       }
+  //       double filteredAngle =
+  //           _previousAngle * 0.1 + angle * 0.90; //low-pass filtering.
+  //       _previousAngle = filteredAngle;
+  //
+  //       setState(() {
+  //         _rotationAngle = filteredAngle;
+  //         _updateLevelingColor(
+  //             _rotationAngle); // Update based on filtered angle
+  //       });
+  //     });
+  //   });
+  // }
   void _startSensorStream() {
     _subscription = accelerometerEvents.listen((AccelerometerEvent event) {
       setState(() {
-        double x = event.x;
-        double y = event.y;
-        double angle = math.atan2(y, x) -
-            math.pi / 2; // Calculate angle from accelerometer data
-        if (_previousAngle == -999) {
-          _previousAngle = angle;
-        }
-        double filteredAngle =
-            _previousAngle * 0.1 + angle * 0.90; //low-pass filtering.
-        _previousAngle = filteredAngle;
+      double x = event.x;
+      double y = event.y;
 
-        setState(() {
-          _rotationAngle = filteredAngle;
-          _updateLevelingColor(
-              _rotationAngle); // Update based on filtered angle
-        });
+      // Calculate the tilt angle relative to the horizon
+      double angle = -math.atan2(y, x);
+
+      // Adjust angle based on device orientation and invert the tilt for the leveling bar
+      angle += math.pi / 2; // Add pi/2 to invert the tilt direction
+      if (_previousAngle == -999) {
+        _previousAngle = angle;
+      }
+      double filteredAngle =
+          _previousAngle * 0.1 + angle * 0.90; //low-pass filtering.
+      _previousAngle = filteredAngle;
+      // Update leveling color based on the adjusted angle
+      _updateLevelingColor(angle);
+
+      setState(() {
+        _rotationAngle = filteredAngle;
+        _updateLevelingColor(
+            _rotationAngle); // Update based on filtered angle
+      });
       });
     });
   }
 
+
+
+
   void _updateLevelingColor(double x) {
-    if (x.abs() < 0.10) {
+    if (x.abs() < 0.05) {
       _levelingColor = Colors.green;
     } else if (x.abs() < .20) {
       _levelingColor = Colors.yellow;
@@ -115,82 +146,66 @@ class _CameraPageState extends State<CameraPage> {
     String popupTitle = '';
     String popupContent = '';
 
+    // Initialize popup title and content based on the category
     if (widget.category == 'selfie') {
+      // Set popup title and content for 'selfie' category
       popupTitle = 'Selfie Tips';
       popupContent =
-          "Good Lighting: Natural light is often the most flattering. Avoid harsh overhead lighting or direct sunlight.\n\n"
+      "Good Lighting: Natural light is often the most flattering. Avoid harsh overhead lighting or direct sunlight.\n\n"
           "Angle: Typically, holding the camera slightly above eye level and angling your face slightly can help accentuate your features.\n\n"
           "Expression: Smile naturally or convey the mood you want to express in the selfie.\n\n"
           "Framing: Center yourself in the frame or use the rule of thirds to create a visually pleasing composition.";
     } else if (widget.category == 'landscapes') {
+      // Set popup title and content for 'landscapes' category
       popupTitle = 'Landscape Tips';
       popupContent =
-          "Use Leading Lines: Incorporate leading lines like roads, rivers, or fences to draw the viewer's eye into the scene.\n\n"
+      "Use Leading Lines: Incorporate leading lines like roads, rivers, or fences to draw the viewer's eye into the scene.\n\n"
           "Golden Hour: Shoot during the golden hour (early morning or late afternoon) for warm, soft lighting.\n\n"
           "Foreground Interest: Include interesting foreground elements to add depth and context to your landscape.\n\n"
           "Rule of Thirds: Use the rule of thirds to compose your shot, placing key elements along the grid lines or intersections.";
     } else if (widget.category == 'close-up') {
+      // Set popup title and content for 'close-up' category
       popupTitle = 'Close-Up Tips';
       popupContent =
-          "Focus on Details: Get close to capture intricate details of your subject.\n\n"
+      "Focus on Details: Get close to capture intricate details of your subject.\n\n"
           "Experiment: Try different angles and perspectives to find unique shots.\n\n"
           "Lighting: Soft, diffused light works best for close-ups to avoid harsh shadows.\n\n"
           "Stability: Grip all four corners of your phone to stabilize your hands for sharp close-up shots.";
     } else if (widget.category == 'general') {
+      // Set popup title and content for 'general' category
       popupTitle = 'General Photography Tips';
       popupContent =
-          "Composition: Follow the rule of thirds and use leading lines for interesting compositions.\n\n"
+      "Composition: Follow the rule of thirds and use leading lines for interesting compositions.\n\n"
           "Lighting: Understand natural light and use it to enhance your photos.\n\n"
           "Experiment: Try different angles and perspectives to find unique shots.\n\n"
           "Clean Backgrounds: Avoid cluttered backgrounds to keep the focus on your subject.";
     }
 
+    // Show the dialog with scrollable content
     await showDialog(
       context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setState) {
-          return AlertDialog(
-            title: Text(popupTitle),
-            content: SingleChildScrollView(
-              child: SizedBox(
-                height: 350, // Set a fixed height for the content area
-                width: MediaQuery.of(context).size.width *
-                    2, // Set width to accommodate two pages
-                child: Column(
-                  children: [
-                    Expanded(
-                      child: PageView(
-                        controller: _pageController,
-                        children: [
-                          Container(
-                            width: MediaQuery.of(context).size.width,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(popupContent),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text("Close"),
-              ),
+      builder: (context) => AlertDialog(
+        title: Text(popupTitle),
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(popupContent),
             ],
-          );
-        },
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text("Close"),
+          ),
+        ],
       ),
     );
   }
+
 
   void _toggleCamera() async {
     final controller = await _controllerFuture;
@@ -253,10 +268,8 @@ class _CameraPageState extends State<CameraPage> {
       _showFocusIndicator = true; // Show the focus indicator after delay
     });
 
-    // Delay to display focus indicator for a certain duration (optional)
     await Future.delayed(
         Duration(milliseconds: 500));
-    // Hide the focus indicator after a certain duration (optional)
     setState(() {
       _showFocusIndicator =
           false; // Hide the focus indicator after a certain duration

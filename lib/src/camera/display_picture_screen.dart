@@ -5,6 +5,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:photo_coach/src/analysis/api_caller.dart';
 //import 'package:photo_coach/src/analysis/analysis_page.dart';
 import 'package:camera/camera.dart';
+import 'package:uuid/uuid.dart';
 
 class DisplayPictureScreen extends StatelessWidget {
   final String imagePath;
@@ -78,9 +79,15 @@ class DisplayPictureScreen extends StatelessWidget {
   Future<void> _saveAndNavigate(BuildContext context) async {
     try {
       final Directory appDocDir = await getApplicationDocumentsDirectory();
-      final String newImagePath = '${appDocDir.path}/image.jpg';
-      final File imageFile = File(imagePath);
-      await imageFile.copy(newImagePath);
+      final String newImagePath = "${appDocDir.path}/${const Uuid().v1()}.jpg";
+      File imgFile = File(imagePath);
+      await imgFile.copy(newImagePath);
+      imgFile.delete();
+
+      if (!context.mounted) {
+        return;
+      }
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
