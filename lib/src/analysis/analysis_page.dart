@@ -29,17 +29,17 @@ class AnalysisPage extends StatelessWidget {
         _MetricBar(
             title: "Brightness: ",
             rating: getRating(analysis["clip_result"]["brightness"]),
-            explanation: "How bright the pic is"),
+            explanation: "Brightness refers to the amount of light in the photo. An adequate brightness level ensures that objects in the photo can be seen clearly."),
         const Divider(),
         _MetricBar(
             title: "Quality: ",
             rating: getRating(analysis["clip_result"]["quality"]),
-            explanation: "How good the pic is"),
+            explanation: "This refers to the overall quality of the photo and its composition."),
         const Divider(),
         _MetricBar(
             title: "Sharpness: ",
             rating: getRating(analysis["clip_result"]["sharpness"]),
-            explanation: "How sharp the pic is"),
+            explanation: "Sharpness refers to how distinct and clear the objects in the photo are. Moving the camera while taking the photo blurs the image, which lowers the sharpness."),
         const Divider(),
         Expanded(
             child: Container(
