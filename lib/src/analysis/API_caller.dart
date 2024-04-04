@@ -22,14 +22,15 @@ class _CallerState extends State<APICaller> {
       "http://photocoachcapstone.pythonanywhere.com/fullanalysis";
   static const Map<String, dynamic> defaultResponse = {
     "clip_result": {
-        "brightness": 0.7804979681968689,
-        "quality": 0.22963981330394745,
-        "sharpness": 0.8442980051040649
+      "brightness": 0.7804979681968689,
+      "quality": 0.22963981330394745,
+      "sharpness": 0.8442980051040649
     },
-    "gpt_result": "Brightness: Good\nClarity: Fair\nSubject Focus: Poor\n\nAdvice to improve this photo:\n- Orientation: Rotate the camera to properly frame the subject.\n- Composition: Decide on a clear subject and compose the shot to emphasize it.\n- Stability: Keep the camera steady to avoid blur.\n- Cleanliness: Make sure the environment is tidy and free from distractions if that is part of the intended subject.\n- Perspective: Choose an angle that adds interest or importance to the subject."
+    "gpt_result":
+        "Brightness: Good\nClarity: Fair\nSubject Focus: Poor\n\nAdvice to improve this photo:\n- Orientation: Rotate the camera to properly frame the subject.\n- Composition: Decide on a clear subject and compose the shot to emphasize it.\n- Stability: Keep the camera steady to avoid blur.\n- Cleanliness: Make sure the environment is tidy and free from distractions if that is part of the intended subject.\n- Perspective: Choose an angle that adds interest or importance to the subject."
   };
 
-  Color getColor(double score){
+  Color getColor(double score) {
     if (score < 0.3) {
       return Colors.red; // Poor
     } else if (score < 0.6) {
@@ -52,7 +53,7 @@ class _CallerState extends State<APICaller> {
         "comp_level": 2
       });
       BaseOptions options =
-          BaseOptions(connectTimeout: const Duration(seconds: 360));
+          BaseOptions(connectTimeout: const Duration(seconds: 5));
       final response = await Dio(options).post(url, data: formData);
 
       log("${response.statusCode} ${response.statusMessage ?? ""}");
@@ -83,14 +84,21 @@ class _CallerState extends State<APICaller> {
             builder: (BuildContext context,
                 AsyncSnapshot<Map<String, dynamic>> snapshot) {
               if (snapshot.connectionState == ConnectionState.done) {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => AnalysisPage(
-                            imgPath: widget.imgPath,
-                            analysis: snapshot.data!)));
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => AnalysisPage(
+                              imgPath: widget.imgPath,
+                              analysis: snapshot.data!,
+                              historyIndex:
+                                  0 // Always 0 because it was just appended and append adds it to the front
+                              )));
+                });
               }
-              return const CircularProgressIndicator();
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
             }));
   }
 }

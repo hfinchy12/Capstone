@@ -23,6 +23,7 @@ dependencies:
   sensors_plus: ^4.0.2
   http: ^0.13.3
   dio: ^5.4.1
+  uuid: ^4.3.3
 
 dev_dependencies:
   flutter_test:
