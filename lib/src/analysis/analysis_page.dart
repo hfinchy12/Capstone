@@ -197,18 +197,45 @@ class _MetricBarState extends State<_MetricBar> {
         ),
       ),
       subtitle: SizedBox(
-        height: 3.0,
+        height: 8.0,
         width: MediaQuery.of(context).size.width,
-        child: Container(
-          height: double.infinity,
-          width: double.infinity,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-              colors: [Colors.red, Colors.yellow, Colors.green[300]!, Colors.green]
-            )
+        child: Stack(
+        children: [
+          Container(
+            height: double.infinity,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(5.0),
+              gradient: LinearGradient(
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+                colors: [Colors.red, Colors.yellow, Colors.green[300]!, Colors.green]
+              )
+            ),
           ),
+          Positioned(
+            left: (String rating){
+              if (rating == "Poor") {
+                return 0.0; // All the way left
+              } else if (rating == "Fair") {
+                return MediaQuery.of(context).size.width/4; // Partially left
+              } else if (rating == "Good") {
+                return MediaQuery.of(context).size.width/2; // Partially right
+              } else if (rating == "Excellent") {
+                return MediaQuery.of(context).size.width*0.755; // All the way right
+              } else {
+                return double.infinity; // Error
+              }
+            }(widget.rating), // Position marker based on rating
+            child: Container(
+              width: 8, // Width of the marker
+              height: 8, // Height of the marker
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.black, // Color of the marker
+              ),
+            ),
+          )]
         ),
       ),
       children: <Widget>[
