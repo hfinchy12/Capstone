@@ -19,7 +19,7 @@ class _CallerState extends State<APICaller> {
   late Future<Map<String, dynamic>> responseFuture;
 
   static const String url =
-      "http://photocoachcapstone.pythonanywhere.com/fullanalysis";
+      "http://photocoachcapstone.pythonanywhere.com/fullasyncanalysis";
   static const Map<String, dynamic> defaultResponse = {
     "clip_result": {
       "brightness": 0.7804979681968689,
@@ -50,7 +50,7 @@ class _CallerState extends State<APICaller> {
       FormData formData = FormData.fromMap({
         "picture": await MultipartFile.fromFile(imgPath),
         "category": category,
-        "comp_level": 2
+        "comp_level": 4
       });
       BaseOptions options =
           BaseOptions(connectTimeout: const Duration(seconds: 5));
