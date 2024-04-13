@@ -98,15 +98,32 @@ class _CameraPageState extends State<CameraPage> {
 
 
 
-  void _updateLevelingColor(double x) {
-    if (x.abs() < 0.05) {
-      _levelingColor = Colors.green;
-    } else if (x.abs() < .20) {
-      _levelingColor = Colors.yellow;
+  void _updateLevelingColor(double angle) {
+    // Adjust angle to be between -pi/2 to pi/2 (equivalent to -90 to 90 degrees)
+    angle %= (2 * math.pi);
+    if (angle > math.pi / 2) {
+      angle -= math.pi;
+    } else if (angle < -math.pi / 2) {
+      angle += math.pi;
+    }
+
+    // Determine the orientation based on the angle
+    if (angle.abs() < math.pi / 60) {
+      _levelingColor = Colors.green; // Portrait orientation
+    } else if ((angle.abs() > math.pi / 2 - math.pi / 60 &&
+        angle.abs() < math.pi / 2 + math.pi / 120) ||
+        (angle.abs() > -math.pi / 2 - math.pi / 120 &&
+            angle.abs() < -math.pi / 2 + math.pi / 60)) {
+      _levelingColor = Colors.green; // Landscape orientation (within 3 degrees)
     } else {
-      _levelingColor = Colors.red;
+      _levelingColor = Colors.red; // Other orientations
     }
   }
+
+
+
+
+
 
   @override
   void dispose() {
@@ -410,6 +427,57 @@ class _CameraPageState extends State<CameraPage> {
             final controller = snapshot.data!;
             return Stack(
               children: [
+                CameraPreview(controller),
+                _buildFocusIndicator(),
+                _buildZoomPercentageIndicator(),
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: MediaQuery.of(context).size.height * 0.5,
+                  child: Visibility(
+                    visible: _showLevelingBar,
+                    child: Transform.rotate(
+                      angle: _rotationAngle > (math.pi / 3) || _rotationAngle < -(math.pi / 3) ? math.pi / 2 : 0,
+                      child: Container(
+                        height: 10,
+                        width: double.infinity,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
+                ),
+
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: MediaQuery.of(context).size.height * 0.5,
+                  child: Visibility(
+                    visible: _showLevelingBar,
+                    child: Center(
+                      child: Transform.rotate(
+                        angle: _rotationAngle,
+                        child: SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.6,
+                          height: 10,
+                          child: Container(
+                            width: double.infinity,
+                            height: double.infinity,
+                            decoration: BoxDecoration(
+                              color: _levelingColor,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Positioned.fill(
+                  child: CustomPaint(
+                    key: _gridKey,
+                    painter: _showGrid ? GridPainter() : null,
+                  ),
+                ),
                 GestureDetector(
                   onTapDown: (TapDownDetails details) {
                     _handleTapToFocus(details.localPosition, controller);
@@ -446,58 +514,7 @@ class _CameraPageState extends State<CameraPage> {
                     });
                   },
                   behavior: HitTestBehavior.opaque, // Ensure gesture detector handles taps and scales independently
-                  child: CameraPreview(controller),
                 ),
-                _buildFocusIndicator(),
-                _buildZoomPercentageIndicator(), // Add this line to include the zoom percentage indicator
-
-                Positioned.fill(
-                  child: CustomPaint(
-                    key: _gridKey, // Assign key to CustomPaint
-                    painter: _showGrid
-                        ? GridPainter()
-                        : null, // Conditionally paint grid
-                  ),
-                ),
-                Positioned(
-                  left: 0,
-                  right: 0,
-                  bottom: MediaQuery.of(context).size.height * 0.1,
-                  child: Visibility(
-                    visible: _showLevelingBar,
-                    child: Container(
-                      height: 10,
-                      width: double.infinity,
-                      color: Colors.grey,
-                    ),
-                  ),
-                ),
-                Positioned(
-                  left: 0,
-                  right: 0,
-                  bottom: MediaQuery.of(context).size.height * 0.1,
-                  child: Visibility(
-                    visible: _showLevelingBar,
-                    child: Center(
-                      child: Transform.rotate(
-                        angle: _rotationAngle,
-                        child: SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.6,
-                          height: 10,
-                          child: Container(
-                            width: double.infinity,
-                            height: double.infinity,
-                            decoration: BoxDecoration(
-                              color: _levelingColor,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-
               ],
             );
           } else {
