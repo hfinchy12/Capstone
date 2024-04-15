@@ -25,7 +25,6 @@ class _CallerState extends State<APICaller> {
   double opacity = 0.70;
   bool hasNavigated = false;
 
-
   static const String url =
       "http://photocoachcapstone.pythonanywhere.com/fullasyncanalysis";
   static const Map<String, dynamic> defaultResponse = {
@@ -35,7 +34,7 @@ class _CallerState extends State<APICaller> {
       "sharpness": 0.8442980051040649
     },
     "gpt_result":
-    "Brightness: Good\nClarity: Fair\nSubject Focus: Poor\n\nAdvice to improve this photo:\n- Orientation: Rotate the camera to properly frame the subject.\n- Composition: Decide on a clear subject and compose the shot to emphasize it.\n- Stability: Keep the camera steady to avoid blur.\n- Cleanliness: Make sure the environment is tidy and free from distractions if that is part of the intended subject.\n- Perspective: Choose an angle that adds interest or importance to the subject."
+        "Brightness: Good\nClarity: Fair\nSubject Focus: Poor\n\nAdvice to improve this photo:\n- Orientation: Rotate the camera to properly frame the subject.\n- Composition: Decide on a clear subject and compose the shot to emphasize it.\n- Stability: Keep the camera steady to avoid blur.\n- Cleanliness: Make sure the environment is tidy and free from distractions if that is part of the intended subject.\n- Perspective: Choose an angle that adds interest or importance to the subject."
   };
 
   Color getColor(double score) {
@@ -50,8 +49,8 @@ class _CallerState extends State<APICaller> {
     }
   }
 
-  Future<Map<String, dynamic>> _sendPicture(String imgPath,
-      String category) async {
+  Future<Map<String, dynamic>> _sendPicture(
+      String imgPath, String category) async {
     Map<String, dynamic> analysis;
 
     try {
@@ -61,7 +60,7 @@ class _CallerState extends State<APICaller> {
         "comp_level": 4
       });
       BaseOptions options =
-      BaseOptions(connectTimeout: const Duration(seconds: 5));
+          BaseOptions(connectTimeout: const Duration(seconds: 5));
       final response = await Dio(options).post(url, data: formData);
 
       log("${response.statusCode} ${response.statusMessage ?? ""}");
