@@ -75,52 +75,6 @@ class AnalysisPage extends StatelessWidget {
         ]);
   }
 
-  Widget _deleteButton(BuildContext context) {
-    return Container(
-        width: 75.0,
-        height: 75.0,
-        margin: const EdgeInsets.fromLTRB(5.0, 0.0, 5.0, 5.0),
-        child: IconButton(
-            icon: Image.asset("assets/images/delete_ico.png"),
-            style: IconButton.styleFrom(
-              shape: ContinuousRectangleBorder(
-                  borderRadius: BorderRadius.circular(20.0)),
-              backgroundColor: Colors.red,
-            ),
-            onPressed: () async {
-              showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                          title: const Text("Delete Analysis"),
-                          content: const Text(
-                              "Would you like to delete this photo analysis result?"),
-                          actions: [
-                            TextButton(
-                              child: const Text("Cancel",
-                                  style: TextStyle(color: Colors.blue)),
-                              onPressed: () => Navigator.pop(context),
-                            ),
-                            TextButton(
-                              child: const Text("Delete",
-                                  style: TextStyle(color: Colors.red)),
-                              onPressed: () async {
-                                await History.remove(historyIndex);
-
-                                if (!context.mounted) {
-                                  return;
-                                }
-
-                                Navigator.pushAndRemoveUntil(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => const HomePage()),
-                                    (Route<dynamic> route) => false);
-                              },
-                            ),
-                          ]));
-            }));
-  }
-
   Widget _deleteIconButton(BuildContext context) {
     return IconButton(
         icon: const Icon(Icons.delete, color: Colors.red),
@@ -158,33 +112,6 @@ class AnalysisPage extends StatelessWidget {
         });
   }
 
-  Widget _saveButton(BuildContext context) {
-    return Container(
-      width: 75.0,
-      height: 75.0,
-      margin: const EdgeInsets.fromLTRB(5.0, 0.0, 5.0, 5.0),
-      child: IconButton(
-        icon: Image.asset("assets/images/checkmark_icon.png",
-            color: Colors.white),
-        style: IconButton.styleFrom(
-          shape: ContinuousRectangleBorder(
-              borderRadius: BorderRadius.circular(20.0)),
-          backgroundColor: Colors.green,
-        ),
-        onPressed: () {
-          if (!context.mounted) {
-            return;
-          }
-
-          Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (context) => const HomePage()),
-              (Route<dynamic> route) => false);
-        },
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -201,12 +128,18 @@ class AnalysisPage extends StatelessWidget {
             ),
             actions: [_deleteIconButton(context)]),
         body: Column(children: <Widget>[
-          SizedBox(
-              height: 200,
-              child: Card(
-                  clipBehavior: Clip.none,
-                  elevation: 0.0,
-                  child: Image.file(File(imgPath)))),
+          GestureDetector(
+            child: SizedBox(
+                height: 200,
+                child: Card(
+                    clipBehavior: Clip.none,
+                    elevation: 0.0,
+                    child: Image.file(File(imgPath)))),
+            onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => ImagePage(imgPath: imgPath))),
+          ),
           const Divider(),
           Expanded(
               child: SingleChildScrollView(
@@ -301,6 +234,26 @@ class _MetricBarState extends State<_MetricBar> {
             ]),
           )),
       children: <Widget>[Text(widget.explanation)],
+    );
+  }
+}
+
+class ImagePage extends StatelessWidget {
+  final String imgPath;
+
+  const ImagePage({super.key, required this.imgPath});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: GestureDetector(
+        child: Center(
+          child: Hero(tag: 'imageHero', child: Image.file(File(imgPath))),
+        ),
+        onTap: () {
+          Navigator.pop(context);
+        },
+      ),
     );
   }
 }
