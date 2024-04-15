@@ -1,7 +1,5 @@
 import 'dart:developer';
-import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter/material.dart';
-//import 'package:photo_coach/src/analysis/API_caller.dart';
 import 'package:photo_coach/src/history.dart';
 import 'dart:io';
 import 'package:photo_coach/src/home_page/home_page.dart';
@@ -21,18 +19,18 @@ String _getRating(double score) {
 }
 
 Color _getColor(double score) {
-    if (score < 0.3) {
-      return Colors.red; // Poor
-    } else if (score < 0.6) {
-      return Colors.yellow; // Fair
-    } else if (score < 0.8) {
-      return Colors.green[300]!; // Good
-    } else if (score <= 1.0) {
-      return Colors.green; // Excellent
-    } else {
-      return Colors.black; // Error
-    }
+  if (score < 0.3) {
+    return Colors.red; // Poor
+  } else if (score < 0.6) {
+    return Colors.yellow; // Fair
+  } else if (score < 0.8) {
+    return Colors.green[300]!; // Good
+  } else if (score <= 1.0) {
+    return Colors.green; // Excellent
+  } else {
+    return Colors.black; // Error
   }
+}
 
 class AnalysisPage extends StatelessWidget {
   final String imgPath;
@@ -55,15 +53,18 @@ class AnalysisPage extends StatelessWidget {
           _MetricBar(
               title: "Overall Quality: ",
               rating: analysis["clip_result"]["quality"],
-              explanation: "Overall quality refers to the composition and clarity of the photo. It can be improved by using composition techniques like \"The Rule of Thirds\" (Placing the focus of your image on an intersection of the gridlines)"),
+              explanation:
+                  "Overall quality refers to the composition and clarity of the photo. It can be improved by using composition techniques like \"The Rule of Thirds\" (Placing the focus of your image on an intersection of the gridlines)"),
           _MetricBar(
               title: "Brightness: ",
               rating: analysis["clip_result"]["brightness"],
-              explanation: "Brightness refers to the amount of light in the photo. An adequate brightness level ensures that objects in the photo can be seen clearly."),
+              explanation:
+                  "Brightness refers to the amount of light in the photo. An adequate brightness level ensures that objects in the photo can be seen clearly."),
           _MetricBar(
               title: "Sharpness: ",
               rating: analysis["clip_result"]["sharpness"],
-              explanation: "Sharpness refers to how distinct and clear the objects in the photo are. Moving the camera while taking the photo blurs the image, which lowers the sharpness."),
+              explanation:
+                  "Sharpness refers to how distinct and clear the objects in the photo are. Moving the camera while taking the photo blurs the image, which lowers the sharpness."),
           const Divider(),
           Container(
               padding: const EdgeInsets.all(8.0),
@@ -76,13 +77,11 @@ class AnalysisPage extends StatelessWidget {
 
   Widget _deleteButton(BuildContext context) {
     return Container(
-        width: 250.0,
-        height: 50.0,
+        width: 75.0,
+        height: 75.0,
         margin: const EdgeInsets.fromLTRB(5.0, 0.0, 5.0, 5.0),
-        child: ElevatedButton.icon(
+        child: IconButton(
             icon: Image.asset("assets/images/delete_ico.png"),
-            label: const Text("Delete",
-                style: TextStyle(fontSize: 24.0, color: Colors.white)),
             style: IconButton.styleFrom(
               shape: ContinuousRectangleBorder(
                   borderRadius: BorderRadius.circular(20.0)),
@@ -97,7 +96,8 @@ class AnalysisPage extends StatelessWidget {
                               "Would you like to delete this photo analysis result?"),
                           actions: [
                             TextButton(
-                              child: const Text("Cancel"),
+                              child: const Text("Cancel",
+                                  style: TextStyle(color: Colors.blue)),
                               onPressed: () => Navigator.pop(context),
                             ),
                             TextButton(
@@ -121,21 +121,85 @@ class AnalysisPage extends StatelessWidget {
             }));
   }
 
+  Widget _deleteIconButton(BuildContext context) {
+    return IconButton(
+        icon: const Icon(Icons.delete, color: Colors.red),
+        onPressed: () async {
+          showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                      title: const Text("Delete Analysis"),
+                      content: const Text(
+                          "Would you like to delete this photo analysis result?"),
+                      actions: [
+                        TextButton(
+                          child: const Text("Cancel",
+                              style: TextStyle(color: Colors.blue)),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                        TextButton(
+                          child: const Text("Delete",
+                              style: TextStyle(color: Colors.red)),
+                          onPressed: () async {
+                            await History.remove(historyIndex);
+
+                            if (!context.mounted) {
+                              return;
+                            }
+
+                            Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => const HomePage()),
+                                (Route<dynamic> route) => false);
+                          },
+                        ),
+                      ]));
+        });
+  }
+
+  Widget _saveButton(BuildContext context) {
+    return Container(
+      width: 75.0,
+      height: 75.0,
+      margin: const EdgeInsets.fromLTRB(5.0, 0.0, 5.0, 5.0),
+      child: IconButton(
+        icon: Image.asset("assets/images/checkmark_icon.png",
+            color: Colors.white),
+        style: IconButton.styleFrom(
+          shape: ContinuousRectangleBorder(
+              borderRadius: BorderRadius.circular(20.0)),
+          backgroundColor: Colors.green,
+        ),
+        onPressed: () {
+          if (!context.mounted) {
+            return;
+          }
+
+          Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => const HomePage()),
+              (Route<dynamic> route) => false);
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Analysis Results'),
-          leading: IconButton(
-            icon: const Icon(Icons.home),
-            onPressed: () {
-              Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (context) => const HomePage()),
-                  (Route<dynamic> route) => false);
-            },
-          ),
-        ),
+            title: const Text('Analysis Results'),
+            leading: IconButton(
+              icon: const Icon(Icons.home),
+              onPressed: () {
+                Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (context) => const HomePage()),
+                    (Route<dynamic> route) => false);
+              },
+            ),
+            actions: [_deleteIconButton(context)]),
         body: Column(children: <Widget>[
           SizedBox(
               height: 200,
@@ -149,7 +213,6 @@ class AnalysisPage extends StatelessWidget {
                   child: Column(children: [
             _addMetrics(analysis),
             const Divider(),
-            _deleteButton(context)
           ])))
         ]));
   }
@@ -190,34 +253,42 @@ class _MetricBarState extends State<_MetricBar> {
           style: const TextStyle(color: Colors.black),
           children: <TextSpan>[
             TextSpan(
-              text: _getRating(widget.rating), 
-              style: TextStyle(color: _getColor(widget.rating))
-            ),
+                text: _getRating(widget.rating),
+                style: TextStyle(color: _getColor(widget.rating))),
           ],
         ),
       ),
       subtitle: SizedBox(
-        height: 8.0,
-        width: MediaQuery.of(context).size.width,
-        child: LayoutBuilder(
-          builder: (context, constraints) => 
-          Stack(    // Gradient bar & score marker
-            children: [
+          height: 8.0,
+          width: MediaQuery.of(context).size.width,
+          child: LayoutBuilder(
+            builder: (context, constraints) =>
+                Stack(// Gradient bar & score marker
+                    children: [
               Container(
                 height: double.infinity,
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(5.0),
-                  gradient: LinearGradient(
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                    colors: [Colors.red, Colors.yellow, Colors.green[300]!, Colors.green],
-                    stops: const [0.0, 0.45, 0.7, 1.0]
-                  )
-                ),
+                    borderRadius: BorderRadius.circular(5.0),
+                    gradient: LinearGradient(
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                        colors: [
+                          Colors.red,
+                          Colors.yellow,
+                          Colors.green[300]!,
+                          Colors.green
+                        ],
+                        stops: const [
+                          0.0,
+                          0.45,
+                          0.7,
+                          1.0
+                        ])),
               ),
               Positioned(
-                left: constraints.maxWidth * widget.rating, // Position marker based on rating
+                left: constraints.maxWidth *
+                    widget.rating, // Position marker based on rating
                 child: Container(
                   width: 8, // Width of the marker
                   height: 8, // Height of the marker
@@ -227,14 +298,9 @@ class _MetricBarState extends State<_MetricBar> {
                   ),
                 ),
               )
-            ]
-          ),
-        )
-      ),
-      children: <Widget>[
-        Text(widget.explanation)
-      ],
+            ]),
+          )),
+      children: <Widget>[Text(widget.explanation)],
     );
   }
-
 }
