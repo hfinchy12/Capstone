@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -44,6 +45,8 @@ class History {
 
     if (prefs.containsKey(key) && prefs.getStringList(key) != null) {
       List<String> history = prefs.getStringList(key)!.toList(growable: true);
+      HistoryEntry entry = HistoryEntry.fromJson(jsonDecode(history[index]));
+      File(entry.imgPath).delete();
       history.removeAt(index);
       prefs.setStringList(key, history);
     }
