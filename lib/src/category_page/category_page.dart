@@ -29,19 +29,19 @@ class CategoryPage extends StatelessWidget {
               children: [
                 CategoryButton(
                     label: 'Selfie',
-                    imageAsset: 'assets/images/selfie.jpg',
+                    imageAsset: 'assets/images/selfie_icon.png',
                     category: 'selfie',
                     fromUpload: fromUpload, // Pass the category parameter
                     uploadImagePath: uploadImagePath),
                 CategoryButton(
-                    label: 'Close-Up',
+                    label: 'Object Close-Up',
                     imageAsset: 'assets/images/food.png',
                     category: 'close-up', // Pass the category parameter
                     fromUpload: fromUpload,
                     uploadImagePath: uploadImagePath),
                 CategoryButton(
                     label: 'Landscapes',
-                    imageAsset: 'assets/images/landscape.jpg',
+                    imageAsset: 'assets/images/landscape_icon.png',
                     category: 'landscapes', // Pass the category parameter
                     fromUpload: fromUpload,
                     uploadImagePath: uploadImagePath),
@@ -78,6 +78,7 @@ class CategoryButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
+
     return TextButton(
       onPressed: () {
         Navigator.push(context, MaterialPageRoute(
@@ -111,7 +112,7 @@ class CategoryButton extends StatelessWidget {
           Image.asset(
             imageAsset,
             width: 120,
-            height: 120,
+            height: 108,
           ),
           const SizedBox(height: 10),
           Text(label),

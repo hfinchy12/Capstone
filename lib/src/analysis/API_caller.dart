@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:dio/dio.dart';
@@ -9,7 +10,8 @@ class APICaller extends StatefulWidget {
   final String imgPath;
   final String category;
 
-  const APICaller({super.key, required this.imgPath, required this.category});
+  const APICaller({Key? key, required this.imgPath, required this.category})
+      : super(key: key);
 
   @override
   State<APICaller> createState() => _CallerState();
@@ -17,6 +19,11 @@ class APICaller extends StatefulWidget {
 
 class _CallerState extends State<APICaller> {
   late Future<Map<String, dynamic>> responseFuture;
+  late StreamController<String> tipsController;
+  late List<String> tips;
+  late int currentTipIndex;
+  double opacity = 0.70;
+  bool hasNavigated = false;
 
   static const String url =
       "http://photocoachcapstone.pythonanywhere.com/fullasyncanalysis";
@@ -74,31 +81,98 @@ class _CallerState extends State<APICaller> {
   void initState() {
     super.initState();
     responseFuture = _sendPicture(widget.imgPath, widget.category);
+    tips = [
+      "Tip: Use both hands to stabilize your phone.",
+      "Tip: Utilize tap-to-focus to put emphasis on objects.",
+      "Tip: Try to limit zoom usage to preserve image quality.",
+      "Tip: Use natural lighting to elevate your photos.",
+      "Tip: Use the leveler and grid to get the best orientation and framing.",
+      "Tip: Avoid relying on camera flash for lighting when possible."
+    ];
+    currentTipIndex = 0;
+    tipsController = StreamController<String>();
+    tipsController.add(tips[currentTipIndex]);
+    // Fade out after 4 seconds
+    Timer(Duration(seconds: 4), () {
+      setState(() {
+        opacity = 0.0;
+      });
+    });
+    Timer.periodic(Duration(seconds: 5), (_) {
+      currentTipIndex = (currentTipIndex + 1) % tips.length;
+      tipsController.add(tips[currentTipIndex]);
+      // Fade in
+      setState(() {
+        opacity = 0.70;
+      });
+      // Fade out after 4 seconds
+      Timer(Duration(seconds: 4), () {
+        setState(() {
+          opacity = 0.0;
+        });
+      });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: FutureBuilder(
-            future: responseFuture,
-            builder: (BuildContext context,
-                AsyncSnapshot<Map<String, dynamic>> snapshot) {
-              if (snapshot.connectionState == ConnectionState.done) {
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  Navigator.push(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            FutureBuilder(
+              future: responseFuture,
+              builder: (BuildContext context,
+                  AsyncSnapshot<Map<String, dynamic>> snapshot) {
+                if (snapshot.connectionState == ConnectionState.done &&
+                    !hasNavigated) {
+                  hasNavigated = true;
+                  WidgetsBinding.instance!.addPostFrameCallback((_) {
+                    Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (_) => AnalysisPage(
-                              imgPath: widget.imgPath,
-                              analysis: snapshot.data!,
-                              historyIndex:
-                                  0 // Always 0 because it was just appended and append adds it to the front
-                              )));
-                });
-              }
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            }));
+                        builder: (_) => AnalysisPage(
+                          imgPath: widget.imgPath,
+                          analysis: snapshot.data!,
+                          historyIndex: 0,
+                        ),
+                      ),
+                    ).then((_) {
+                      // Reset hasNavigated when user navigates back from AnalysisPage
+                      hasNavigated = false;
+                    });
+                  });
+                }
+                return CircularProgressIndicator();
+              },
+            ),
+            SizedBox(height: 20),
+            StreamBuilder<String>(
+              stream: tipsController.stream,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return AnimatedOpacity(
+                    duration: Duration(milliseconds: 500),
+                    opacity: opacity,
+                    curve: Curves.easeInOut,
+                    child: Text(
+                      snapshot.data!,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontStyle: FontStyle.italic,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  );
+                } else {
+                  return Container(); // Or any placeholder for when there's no data
+                }
+              },
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
