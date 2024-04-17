@@ -40,7 +40,7 @@ class CategoryPage extends StatelessWidget {
                     fromUpload: fromUpload,
                     uploadImagePath: uploadImagePath),
                 CategoryButton(
-                    label: 'Landscapes',
+                    label: 'Landscape',
                     imageAsset: 'assets/images/landscape.png',
                     category: 'landscapes', // Pass the category parameter
                     fromUpload: fromUpload,
