@@ -29,25 +29,25 @@ class CategoryPage extends StatelessWidget {
               children: [
                 CategoryButton(
                     label: 'Selfie',
-                    imageAsset: 'assets/images/selfie_icon.png',
+                    imageAsset: 'assets/images/selfie.png',
                     category: 'selfie',
                     fromUpload: fromUpload, // Pass the category parameter
                     uploadImagePath: uploadImagePath),
                 CategoryButton(
                     label: 'Object Close-Up',
-                    imageAsset: 'assets/images/food.png',
+                    imageAsset: 'assets/images/object_closeup.png',
                     category: 'close-up', // Pass the category parameter
                     fromUpload: fromUpload,
                     uploadImagePath: uploadImagePath),
                 CategoryButton(
-                    label: 'Landscapes',
-                    imageAsset: 'assets/images/landscape_icon.png',
+                    label: 'Landscape',
+                    imageAsset: 'assets/images/landscape.png',
                     category: 'landscapes', // Pass the category parameter
                     fromUpload: fromUpload,
                     uploadImagePath: uploadImagePath),
                 CategoryButton(
                     label: 'General',
-                    imageAsset: 'assets/images/dog.png',
+                    imageAsset: 'assets/images/general.png',
                     category: 'general', // Pass the category parameter
                     fromUpload: fromUpload,
                     uploadImagePath: uploadImagePath),
