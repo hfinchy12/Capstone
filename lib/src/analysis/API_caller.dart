@@ -25,8 +25,9 @@ class _CallerState extends State<APICaller> {
   double opacity = 0.70;
   bool hasNavigated = false;
 
-  static const String url =
-      "http://photocoachcapstone.pythonanywhere.com/fullasyncanalysis";
+  static const String url = "http://photocoachcapstone.pythonanywhere.com/fullasyncanalysis";
+  
+  // Gives a proper response to the AnalysisPage when the backend isn't reached
   static const Map<String, dynamic> defaultResponse = {
     "clip_result": {
       "brightness": 0.7804979681968689,
@@ -36,6 +37,8 @@ class _CallerState extends State<APICaller> {
     "gpt_result":
         "Brightness: Good\nClarity: Fair\nSubject Focus: Poor\n\nAdvice to improve this photo:\n- Orientation: Rotate the camera to properly frame the subject.\n- Composition: Decide on a clear subject and compose the shot to emphasize it.\n- Stability: Keep the camera steady to avoid blur.\n- Cleanliness: Make sure the environment is tidy and free from distractions if that is part of the intended subject.\n- Perspective: Choose an angle that adds interest or importance to the subject."
   };
+
+  // Lets users know something went wrong
   static const Map<String, dynamic> errorResponse = {
     "clip_result": {
       "brightness": -1.0,
