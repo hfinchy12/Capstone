@@ -36,6 +36,15 @@ class _CallerState extends State<APICaller> {
     "gpt_result":
         "Brightness: Good\nClarity: Fair\nSubject Focus: Poor\n\nAdvice to improve this photo:\n- Orientation: Rotate the camera to properly frame the subject.\n- Composition: Decide on a clear subject and compose the shot to emphasize it.\n- Stability: Keep the camera steady to avoid blur.\n- Cleanliness: Make sure the environment is tidy and free from distractions if that is part of the intended subject.\n- Perspective: Choose an angle that adds interest or importance to the subject."
   };
+  static const Map<String, dynamic> errorResponse = {
+    "clip_result": {
+      "brightness": -1.0,
+      "quality": -1.0,
+      "sharpness": -1.0
+    },
+    "gpt_result":
+        "There was an error connecting to the evaluation service. Please ensure you are connected to the internet and reupload the photo."
+  };
 
   Color getColor(double score) {
     if (score < 0.3) {
@@ -64,10 +73,10 @@ class _CallerState extends State<APICaller> {
       final response = await Dio(options).post(url, data: formData);
 
       developer.log("${response.statusCode} ${response.statusMessage ?? ""}");
-      analysis = response.statusCode == 200 ? response.data : defaultResponse;
+      analysis = response.statusCode == 200 ? response.data : errorResponse;
     } catch (e) {
       developer.log(e.toString());
-      analysis = defaultResponse;
+      analysis = errorResponse;
     }
 
     final HistoryEntry historyEntry = HistoryEntry(

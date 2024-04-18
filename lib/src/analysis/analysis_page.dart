@@ -5,7 +5,9 @@ import 'dart:io';
 import 'package:photo_coach/src/home_page/home_page.dart';
 
 String _getRating(double score) {
-  if (score < 0.3) {
+  if (score < 0.0 || score > 1.0){
+    return 'Error';
+  } else if (score < 0.3) {
     return 'Poor';
   } else if (score < 0.6) {
     return 'Fair';
@@ -14,12 +16,14 @@ String _getRating(double score) {
   } else if (score <= 1.0) {
     return 'Excellent';
   } else {
-    return "Error";
+    return 'Error';
   }
 }
 
 Color _getColor(double score) {
-  if (score < 0.3) {
+  if (score < 0.0 || score > 1.0){
+    return Colors.black; // Error
+  } else if (score < 0.3) {
     return Colors.red; // Poor
   } else if (score < 0.6) {
     return Colors.yellow; // Fair
@@ -28,7 +32,7 @@ Color _getColor(double score) {
   } else if (score <= 1.0) {
     return Colors.green; // Excellent
   } else {
-    return Colors.black; // Error
+    return Colors.black; // Should not be possible, but removes the non-null return warning
   }
 }
 
@@ -168,12 +172,10 @@ class _MetricBar extends StatefulWidget {
 }
 
 class _MetricBarState extends State<_MetricBar> {
-  //bool _expanded = false;
 
   @override
   void initState() {
     super.initState();
-    //_expanded = false;
   }
 
   @override
@@ -220,8 +222,7 @@ class _MetricBarState extends State<_MetricBar> {
                         ])),
               ),
               Positioned(
-                left: constraints.maxWidth *
-                    widget.rating, // Position marker based on rating
+                left: constraints.maxWidth * widget.rating, // Position marker based on rating
                 child: Container(
                   width: 8, // Width of the marker
                   height: 8, // Height of the marker
@@ -233,7 +234,7 @@ class _MetricBarState extends State<_MetricBar> {
               )
             ]),
           )),
-      children: <Widget>[Text(widget.explanation)],
+      children: <Widget>[Text('Numeric Score: ${widget.rating}\n${widget.explanation}')],
     );
   }
 }
