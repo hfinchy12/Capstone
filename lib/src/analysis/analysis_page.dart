@@ -258,7 +258,30 @@ class _MetricBarState extends State<_MetricBar> {
               )
             ]),
           )),
-      children: <Widget>[Text('Numeric Score: ${widget.rating}\n${widget.explanation}')],
+      children: <Widget>[
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            RichText(
+              text: TextSpan(
+                children: [
+                  TextSpan(
+                    text: 'Score: ''${(widget.rating * 100).toStringAsFixed(2)}%',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Text(
+              '${widget.explanation}',
+            ),
+          ],
+        ),
+      ],
+
     );
   }
 }
