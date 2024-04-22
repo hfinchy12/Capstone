@@ -25,6 +25,7 @@ dependencies:
   dio: ^5.4.1
   uuid: ^4.3.3
   flutter_markdown: ^0.6.22+1
+  flutter_launcher_icons: ^0.13.1
 
 dev_dependencies:
   flutter_test:
@@ -41,3 +42,9 @@ flutter:
   assets:
     # Add assets from the images directory to the application.
     - assets/images/
+  
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/pc_icon.png"
+  min_sdk_android: 16 # android min sdk min:16, default 21

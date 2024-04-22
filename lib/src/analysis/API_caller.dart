@@ -1,5 +1,6 @@
 import 'dart:async';
-import 'dart:developer';
+import 'dart:developer' as developer;
+import 'dart:math';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -10,8 +11,7 @@ class APICaller extends StatefulWidget {
   final String imgPath;
   final String category;
 
-  const APICaller({Key? key, required this.imgPath, required this.category})
-      : super(key: key);
+  const APICaller({super.key, required this.imgPath, required this.category});
 
   @override
   State<APICaller> createState() => _CallerState();
@@ -25,8 +25,9 @@ class _CallerState extends State<APICaller> {
   double opacity = 0.70;
   bool hasNavigated = false;
 
-  static const String url =
-      "http://photocoachcapstone.pythonanywhere.com/fullasyncanalysis";
+  static const String url = "http://photocoachcapstone.pythonanywhere.com/fullasyncanalysis";
+  
+  // Gives a proper response to the AnalysisPage when the backend isn't reached
   static const Map<String, dynamic> defaultResponse = {
     "clip_result": {
       "brightness": 0.7804979681968689,
@@ -35,6 +36,17 @@ class _CallerState extends State<APICaller> {
     },
     "gpt_result":
         "Brightness: Good\nClarity: Fair\nSubject Focus: Poor\n\nAdvice to improve this photo:\n- Orientation: Rotate the camera to properly frame the subject.\n- Composition: Decide on a clear subject and compose the shot to emphasize it.\n- Stability: Keep the camera steady to avoid blur.\n- Cleanliness: Make sure the environment is tidy and free from distractions if that is part of the intended subject.\n- Perspective: Choose an angle that adds interest or importance to the subject."
+  };
+
+  // Lets users know something went wrong
+  static const Map<String, dynamic> errorResponse = {
+    "clip_result": {
+      "brightness": -1.0,
+      "quality": -1.0,
+      "sharpness": -1.0
+    },
+    "gpt_result":
+        "There was an error connecting to the evaluation service. Please ensure you are connected to the internet and reupload the photo."
   };
 
   Color getColor(double score) {
@@ -63,11 +75,11 @@ class _CallerState extends State<APICaller> {
           BaseOptions(connectTimeout: const Duration(seconds: 5));
       final response = await Dio(options).post(url, data: formData);
 
-      log("${response.statusCode} ${response.statusMessage ?? ""}");
-      analysis = response.statusCode == 200 ? response.data : defaultResponse;
+      developer.log("${response.statusCode} ${response.statusMessage ?? ""}");
+      analysis = response.statusCode == 200 ? response.data : errorResponse;
     } catch (e) {
-      log(e.toString());
-      analysis = defaultResponse;
+      developer.log(e.toString());
+      analysis = errorResponse;
     }
 
     final HistoryEntry historyEntry = HistoryEntry(
@@ -81,6 +93,7 @@ class _CallerState extends State<APICaller> {
   void initState() {
     super.initState();
     responseFuture = _sendPicture(widget.imgPath, widget.category);
+
     tips = [
       "Tip: Use both hands to stabilize your phone.",
       "Tip: Utilize tap-to-focus to put emphasis on objects.",
@@ -89,24 +102,36 @@ class _CallerState extends State<APICaller> {
       "Tip: Use the leveler and grid to get the best orientation and framing.",
       "Tip: Avoid relying on camera flash for lighting when possible."
     ];
-    currentTipIndex = 0;
+    currentTipIndex = Random().nextInt(tips.length);
     tipsController = StreamController<String>();
     tipsController.add(tips[currentTipIndex]);
+
     // Fade out after 4 seconds
-    Timer(Duration(seconds: 4), () {
+    Timer(const Duration(seconds: 4), () {
+      if (!mounted) {
+        return;
+      }
       setState(() {
         opacity = 0.0;
       });
     });
-    Timer.periodic(Duration(seconds: 5), (_) {
+
+    Timer.periodic(const Duration(seconds: 5), (_) {
       currentTipIndex = (currentTipIndex + 1) % tips.length;
       tipsController.add(tips[currentTipIndex]);
+      if (!mounted) {
+        return;
+      }
       // Fade in
       setState(() {
         opacity = 0.70;
       });
+
       // Fade out after 4 seconds
-      Timer(Duration(seconds: 4), () {
+      Timer(const Duration(seconds: 4), () {
+        if (!mounted) {
+          return;
+        }
         setState(() {
           opacity = 0.0;
         });
@@ -144,21 +169,21 @@ class _CallerState extends State<APICaller> {
                     });
                   });
                 }
-                return CircularProgressIndicator();
+                return const CircularProgressIndicator();
               },
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             StreamBuilder<String>(
               stream: tipsController.stream,
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   return AnimatedOpacity(
-                    duration: Duration(milliseconds: 500),
+                    duration: const Duration(milliseconds: 500),
                     opacity: opacity,
                     curve: Curves.easeInOut,
                     child: Text(
                       snapshot.data!,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 16,
                         fontStyle: FontStyle.italic,
                       ),
