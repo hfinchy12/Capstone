@@ -71,11 +71,35 @@ class AnalysisPage extends StatelessWidget {
                   "Sharpness refers to how distinct and clear the objects in the photo are. Moving the camera while taking the photo blurs the image, which lowers the sharpness."),
           const Divider(),
           Container(
-              padding: const EdgeInsets.all(8.0),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.black),
-              ),
-              child: Text(analysis['gpt_result'], textAlign: TextAlign.left))
+            padding: const EdgeInsets.all(8.0),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.black),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Feedback",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    decoration: TextDecoration.underline,
+                    fontSize: 20, // Adjust the font size as needed
+                  ),
+                ),
+                SizedBox(height: 8), // Adjust the spacing between "Feedback" and the GPT response
+                RichText(
+                  text: TextSpan(
+                    text: analysis['gpt_result'],
+                    style: TextStyle(
+                      color: Colors.black, // Set the text color to black
+                    ),
+                  ),
+                  textAlign: TextAlign.left,
+                ),
+              ],
+            ),
+          ),
+
         ]);
   }
 
