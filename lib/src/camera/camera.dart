@@ -44,28 +44,6 @@ class _CameraPageState extends State<CameraPage> {
     _showLevelingBar = false; // Set leveling bar off by default
   }
 
-  // void _startSensorStream() {
-  //   _subscription = accelerometerEvents.listen((AccelerometerEvent event) {
-  //     setState(() {
-  //       double x = event.x;
-  //       double y = event.y;
-  //       double angle = math.atan2(y, x) -
-  //           math.pi / 2; // Calculate angle from accelerometer data
-  //       if (_previousAngle == -999) {
-  //         _previousAngle = angle;
-  //       }
-  //       double filteredAngle =
-  //           _previousAngle * 0.1 + angle * 0.90; //low-pass filtering.
-  //       _previousAngle = filteredAngle;
-  //
-  //       setState(() {
-  //         _rotationAngle = filteredAngle;
-  //         _updateLevelingColor(
-  //             _rotationAngle); // Update based on filtered angle
-  //       });
-  //     });
-  //   });
-  // }
   void _startSensorStream() {
     _subscription = accelerometerEvents.listen((AccelerometerEvent event) {
       setState(() {
@@ -95,9 +73,6 @@ class _CameraPageState extends State<CameraPage> {
     });
   }
 
-
-
-
   void _updateLevelingColor(double angle) {
     // Adjust angle to be between -pi/2 to pi/2 (equivalent to -90 to 90 degrees)
     angle %= (2 * math.pi);
@@ -119,11 +94,6 @@ class _CameraPageState extends State<CameraPage> {
       _levelingColor = Colors.red; // Other orientations
     }
   }
-
-
-
-
-
 
   @override
   void dispose() {
@@ -223,7 +193,6 @@ class _CameraPageState extends State<CameraPage> {
     );
   }
 
-
   void _toggleCamera() async {
     final controller = await _controllerFuture;
     CameraLensDirection newDirection =
@@ -293,8 +262,6 @@ class _CameraPageState extends State<CameraPage> {
     });
   }
 
-
-
   Widget _buildFocusIndicator() {
     return _showFocusIndicator && _focusIndicatorPosition != null
         ? Positioned(
@@ -335,9 +302,6 @@ class _CameraPageState extends State<CameraPage> {
       ),
     );
   }
-
-
-
 
   @override
   Widget build(BuildContext context) {
