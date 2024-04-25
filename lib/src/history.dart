@@ -1,3 +1,4 @@
+library photo_history;
 import 'dart:convert';
 import 'dart:io';
 

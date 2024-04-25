@@ -1,10 +1,9 @@
+library home_page;
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:photo_coach/src/analysis/analysis_page.dart';
-
 import 'package:photo_coach/src/category_page/category_page.dart';
 import 'package:photo_coach/src/history.dart';
 import 'package:uuid/uuid.dart';
