@@ -1,14 +1,14 @@
+library home_page;
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:photo_coach/src/analysis/analysis_page.dart';
-
 import 'package:photo_coach/src/category_page/category_page.dart';
 import 'package:photo_coach/src/history.dart';
 import 'package:uuid/uuid.dart';
 
+/// Displays options for the user to upload or take a picture and view their evaluation [History]
 class HomePage extends StatefulWidget {
   const HomePage({super.key, this.appTitle = ""});
 
@@ -39,6 +39,9 @@ class _HomePageState extends State<HomePage> {
         ])));
   }
 
+  /// For the user to begin uploading a photo
+  /// 
+  /// Navigates the user to their camera roll when tapped.
   Widget uploadButton(BuildContext context) {
     return Container(
         width: 500.0,
@@ -56,6 +59,9 @@ class _HomePageState extends State<HomePage> {
             }));
   }
 
+  /// For the user to begin taking a photo
+  /// 
+  /// Navigates the user to the [CategoryPage] when tapped.
   Widget cameraButton(BuildContext context) {
     return Container(
         width: 500.0,

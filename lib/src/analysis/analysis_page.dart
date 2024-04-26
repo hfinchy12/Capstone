@@ -1,10 +1,18 @@
+library analysis_page;
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:photo_coach/src/history.dart';
 import 'dart:io';
 import 'package:photo_coach/src/home_page/home_page.dart';
 
-String _getRating(double score) {
+/// Converts a metric's raw numeric score into a verbal rating. 
+/// 
+/// Poor = [0, 0.3) 
+/// Fair = [0.3, 0.6)
+/// Good = [0.6, 0.8)
+/// Excellent = [0.8, 1.0]
+/// An invalid value returns "Error".
+String getRating(double score) {
   if (score < 0.0 || score > 1.0){
     return 'Error';
   } else if (score < 0.3) {
@@ -20,7 +28,15 @@ String _getRating(double score) {
   }
 }
 
-Color _getColor(double score) {
+/// Converts a metric's raw numeric score into an associated color value ([0,1] -> [red,green])
+/// to appropriately color the rating on the _MetricBar.
+/// 
+/// red = [0, 0.3) 
+/// yellow = [0.3, 0.6)
+/// light green = [0.6, 0.8)
+/// green = [0.8, 1.0]
+/// An invalid value returns black.
+Color getColor(double score) {
   if (score < 0.0 || score > 1.0){
     return Colors.black; // Error
   } else if (score < 0.3) {
@@ -36,6 +52,7 @@ Color _getColor(double score) {
   }
 }
 
+/// The AnalysisPage Widget renders a page to display the contents of the [analysis] to the user.
 class AnalysisPage extends StatelessWidget {
   final String imgPath;
   final Map<String, dynamic> analysis;
@@ -46,7 +63,9 @@ class AnalysisPage extends StatelessWidget {
       required this.imgPath,
       required this.analysis,
       required this.historyIndex});
-
+  
+  /// _addMetrics simplifies the readability of the [AnalysisPage.build] function.
+  /// It creates three [_MetricBar]s for the CLIPiqa evaluation and a textbox for the GPT-4 feedback.
   Widget _addMetrics(Map<String, dynamic> analysis) {
     log(analysis.toString());
     return ListView(
@@ -78,7 +97,7 @@ class AnalysisPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   "Feedback", //Feedback header
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
@@ -86,11 +105,11 @@ class AnalysisPage extends StatelessWidget {
                     fontSize: 20, // Adjust the font size as needed
                   ),
                 ),
-                SizedBox(height: 8), // Adjust the spacing between "Feedback" and the GPT response
+                const SizedBox(height: 8), // Adjust the spacing between "Feedback" and the GPT response
                 RichText(
                   text: TextSpan(
                     text: analysis['gpt_result'],
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.black, // Set the text color to black
                     ),
                   ),
@@ -103,6 +122,8 @@ class AnalysisPage extends StatelessWidget {
         ]);
   }
 
+  /// The [_deleteIconButton] provides a way for users to call [History.remove] from the [AnalysisPage].
+  /// Tapping the button first displays an [AlertDialog] so the user can confirm that they want to delete the evaluation.
   Widget _deleteIconButton(BuildContext context) {
     return IconButton(
         icon: const Icon(Icons.delete, color: Colors.red),
@@ -183,6 +204,11 @@ class AnalysisPage extends StatelessWidget {
 * "How would I go about making a page with an image at the top and different
   expandable textboxes in rows below that image?"
 * Generated 2/26/24 */
+/// The _MetricBar class renders a widget that displays the score/([rating]) and [explanation] of a single evaluation metric.
+/// Most of its functionality is housed in [_MetricBarState].
+/// 
+/// Future Consideration: It may no longer be necessary for _MetricBar to extend [StatefulWidget], as opposed to [StatelessWidget].
+/// The current extension is an artifact of trying to implement the [ExpansionTile]'s functionality before ExpansionTile was directly included.
 class _MetricBar extends StatefulWidget {
   final String title;
   final double rating;
@@ -195,6 +221,7 @@ class _MetricBar extends StatefulWidget {
   State<_MetricBar> createState() => _MetricBarState();
 }
 
+/// 
 class _MetricBarState extends State<_MetricBar> {
 
   @override
@@ -212,8 +239,8 @@ class _MetricBarState extends State<_MetricBar> {
           style: const TextStyle(color: Colors.black),
           children: <TextSpan>[
             TextSpan(
-                text: _getRating(widget.rating),
-                style: TextStyle(color: _getColor(widget.rating))),
+                text: getRating(widget.rating),
+                style: TextStyle(color: getColor(widget.rating))),
           ],
         ),
       ),
@@ -222,8 +249,9 @@ class _MetricBarState extends State<_MetricBar> {
           width: MediaQuery.of(context).size.width,
           child: LayoutBuilder(
             builder: (context, constraints) =>
-                Stack(// Gradient bar & score marker
-                    children: [
+                // Gradient bar & score marker
+              Stack(
+                  children: [
               Container(
                 height: double.infinity,
                 width: double.infinity,
@@ -267,7 +295,7 @@ class _MetricBarState extends State<_MetricBar> {
                 children: [
                   TextSpan(
                     text: 'Score: ''${(widget.rating * 100).toStringAsFixed(2)}%',
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.bold,
                     ),
@@ -276,7 +304,7 @@ class _MetricBarState extends State<_MetricBar> {
               ),
             ),
             Text(
-              '${widget.explanation}',
+              widget.explanation,
             ),
           ],
         ),
@@ -286,6 +314,7 @@ class _MetricBarState extends State<_MetricBar> {
   }
 }
 
+/// ImagePage provides the user with a full-screen view of the image displayed on the [AnalysisPage].
 class ImagePage extends StatelessWidget {
   final String imgPath;
 
