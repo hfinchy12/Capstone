@@ -8,6 +8,11 @@ import 'package:flutter/material.dart';
 import 'package:photo_coach/src/analysis/analysis_page.dart';
 import 'package:photo_coach/src/history.dart';
 
+/// Sends the photo at [imgPath] to the backend along with [category] and waits for and handles the response
+/// 
+/// While awaiting the response from the backend, the APICaller displays a loading wheel and a sequence of tips.
+/// Once the backend responds, the APICaller constructs an [AnalysisPage] with the response. If the backend returns an error
+/// or the connection fails, [defaultResponse] or [errorResponse] are passed to the AnalysisPage instead.
 class APICaller extends StatefulWidget {
   final String imgPath;
   final String category;
@@ -39,7 +44,7 @@ class _CallerState extends State<APICaller> {
         "Brightness: Good\nClarity: Fair\nSubject Focus: Poor\n\nAdvice to improve this photo:\n- Orientation: Rotate the camera to properly frame the subject.\n- Composition: Decide on a clear subject and compose the shot to emphasize it.\n- Stability: Keep the camera steady to avoid blur.\n- Cleanliness: Make sure the environment is tidy and free from distractions if that is part of the intended subject.\n- Perspective: Choose an angle that adds interest or importance to the subject."
   };
 
-  // Lets users know something went wrong
+  // Gives an invalid response to the AnalysisPage, letting the user know the backend wasn't reached
   static const Map<String, dynamic> errorResponse = {
     "clip_result": {
       "brightness": -1.0,
@@ -50,21 +55,36 @@ class _CallerState extends State<APICaller> {
         "There was an error connecting to the evaluation service. Please ensure you are connected to the internet and reupload the photo."
   };
 
+  /// Converts a metric's raw numeric score into an associated color value ([0,1] -> [red,green])
+  /// to appropriately color the dot on the [HomePage]'s [History].
+  /// 
+  /// red = [0, 0.3) 
+  /// yellow = [0.3, 0.6)
+  /// light green = [0.6, 0.8)
+  /// green = [0.8, 1.0]
+  /// An invalid value returns black.
   Color getColor(double score) {
-    if (score < 0.3) {
+    if (score < 0.0 || score > 1.0){
+      return Colors.black; // Error
+    } else if (score < 0.3) {
       return Colors.red; // Poor
     } else if (score < 0.6) {
       return Colors.yellow; // Fair
     } else if (score < 0.8) {
       return Colors.green[300]!; // Good
-    } else {
+    } else if (score <= 1.0) {
       return Colors.green; // Excellent
+    } else {
+      return Colors.black; // Should not be possible, but removes the non-null return warning
     }
   }
 
+  /// Packages the photo at [imgPath] into a POST request to the backend, sends the request, handles the response,
+  /// adds the photo to the [History], and returns the [analysis] response as a [Map]
   Future<Map<String, dynamic>> _sendPicture(
       String imgPath, String category) async {
     Map<String, dynamic> analysis;
+
 
     try {
       FormData formData = FormData.fromMap({
@@ -83,8 +103,7 @@ class _CallerState extends State<APICaller> {
       analysis = errorResponse;
     }
 
-    final HistoryEntry historyEntry = HistoryEntry(
-        imgPath, analysis, getColor(analysis["clip_result"]["quality"]));
+    final HistoryEntry historyEntry = HistoryEntry(imgPath, analysis, getColor(analysis["clip_result"]["quality"]));
     History.append(historyEntry);
 
     return analysis;

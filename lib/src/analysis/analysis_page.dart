@@ -4,16 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:photo_coach/src/history.dart';
 import 'dart:io';
 import 'package:photo_coach/src/home_page/home_page.dart';
-//import 'package:dartdoc/dartdoc.dart';
 
-/// _getRating converts a metric's raw numeric score into a verbal rating. 
+/// Converts a metric's raw numeric score into a verbal rating. 
 /// 
 /// Poor = [0, 0.3) 
 /// Fair = [0.3, 0.6)
 /// Good = [0.6, 0.8)
 /// Excellent = [0.8, 1.0]
 /// An invalid value returns "Error".
-String _getRating(double score) {
+String getRating(double score) {
   if (score < 0.0 || score > 1.0){
     return 'Error';
   } else if (score < 0.3) {
@@ -29,10 +28,15 @@ String _getRating(double score) {
   }
 }
 
-/// _getColor converts a metric's raw numeric score into an associated color value ([0,1] -> [red,green]) 
+/// Converts a metric's raw numeric score into an associated color value ([0,1] -> [red,green])
 /// to appropriately color the rating on the _MetricBar.
+/// 
+/// red = [0, 0.3) 
+/// yellow = [0.3, 0.6)
+/// light green = [0.6, 0.8)
+/// green = [0.8, 1.0]
 /// An invalid value returns black.
-Color _getColor(double score) {
+Color getColor(double score) {
   if (score < 0.0 || score > 1.0){
     return Colors.black; // Error
   } else if (score < 0.3) {
@@ -235,8 +239,8 @@ class _MetricBarState extends State<_MetricBar> {
           style: const TextStyle(color: Colors.black),
           children: <TextSpan>[
             TextSpan(
-                text: _getRating(widget.rating),
-                style: TextStyle(color: _getColor(widget.rating))),
+                text: getRating(widget.rating),
+                style: TextStyle(color: getColor(widget.rating))),
           ],
         ),
       ),
