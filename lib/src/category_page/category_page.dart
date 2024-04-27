@@ -1,12 +1,12 @@
 library category_page;
+
 import 'package:flutter/material.dart';
 import 'package:photo_coach/src/analysis/api_caller.dart';
 import 'package:photo_coach/src/camera/camera.dart';
 
 class CategoryPage extends StatelessWidget {
   const CategoryPage(
-      {Key? key, this.fromUpload = false, this.uploadImagePath = ""})
-      : super(key: key);
+      {super.key, this.fromUpload = false, this.uploadImagePath = ""});
 
   final bool fromUpload;
   final String uploadImagePath;

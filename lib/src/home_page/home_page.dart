@@ -1,4 +1,5 @@
 library home_page;
+
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -8,17 +9,21 @@ import 'package:photo_coach/src/category_page/category_page.dart';
 import 'package:photo_coach/src/history.dart';
 import 'package:uuid/uuid.dart';
 
-/// Displays options for the user to upload or take a picture and view their evaluation [History]
+/// The [HomePage] displays options for the user to upload or take a picture and view their evaluation [History].
 class HomePage extends StatefulWidget {
+  /// Title of the app
+  final String appTitle;
+
+  /// Constructs the [HomePage] and sets the [appTitle].
   const HomePage({super.key, this.appTitle = ""});
 
   @override
-  State<HomePage> createState() => _HomePageState();
-
-  final String appTitle;
+  State<HomePage> createState() => HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+/// The [HomePageState] class contains the functionality for the [HomePage] class.
+class HomePageState extends State<HomePage> {
+  /// Builds the widget to be displayed in the UI.
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,8 +44,8 @@ class _HomePageState extends State<HomePage> {
         ])));
   }
 
-  /// For the user to begin uploading a photo
-  /// 
+  /// Uploads a photo for analysis from the user's camera roll.
+  ///
   /// Navigates the user to their camera roll when tapped.
   Widget uploadButton(BuildContext context) {
     return Container(
@@ -59,9 +64,9 @@ class _HomePageState extends State<HomePage> {
             }));
   }
 
-  /// For the user to begin taking a photo
-  /// 
-  /// Navigates the user to the [CategoryPage] when tapped.
+  /// Navigates the user to the camera to take a photo for analysis.
+  ///
+  /// First navigates the user to the [CategoryPage] when tapped.
   Widget cameraButton(BuildContext context) {
     return Container(
         width: 500.0,
@@ -82,6 +87,7 @@ class _HomePageState extends State<HomePage> {
             }));
   }
 
+  /// Saves the uploaded image to the [History] and navigates to the [CategoryPage].
   void uploadImage() async {
     final ImagePicker picker = ImagePicker();
     final XFile? pickedFile =
@@ -104,6 +110,7 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  /// Displays the user's history.
   Widget history() {
     return FutureBuilder(
         future: historyFuture(),
@@ -113,6 +120,7 @@ class _HomePageState extends State<HomePage> {
         });
   }
 
+  /// Returns a widget containing user's history as a grid.
   Future<Widget> historyFuture() async {
     List<HistoryEntry> history = await History.getHistory();
 

@@ -1,10 +1,11 @@
 library display_picture_screen;
+
+import 'dart:developer';
 import 'dart:io';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:photo_coach/src/analysis/api_caller.dart';
-//import 'package:photo_coach/src/analysis/analysis_page.dart';
 import 'package:camera/camera.dart';
 import 'package:uuid/uuid.dart';
 
@@ -14,16 +15,15 @@ class DisplayPictureScreen extends StatelessWidget {
   final CameraLensDirection lensDirection; // Add lens direction parameter
 
   const DisplayPictureScreen(
-      {Key? key,
+      {super.key,
       required this.imagePath,
       required this.category,
-      required this.lensDirection})
-      : super(key: key);
+      required this.lensDirection});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Retake Photo')),
+      appBar: AppBar(title: const Text('Retake Photo')),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -33,7 +33,7 @@ class DisplayPictureScreen extends StatelessWidget {
               future: getFile(imagePath),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
+                  return const Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
                   return Center(
                       child: Text(
@@ -48,7 +48,7 @@ class DisplayPictureScreen extends StatelessWidget {
                     child: Image.file(snapshot.data!),
                   );
                 } else {
-                  return Center(child: Text('Image not found'));
+                  return const Center(child: Text('Image not found'));
                 }
               },
             ),
@@ -61,7 +61,7 @@ class DisplayPictureScreen extends StatelessWidget {
               backgroundColor:
                   Colors.green, // Set the button background color to green
             ),
-            child: Text(
+            child: const Text(
               'Analyze Photo',
               style:
                   TextStyle(color: Colors.white), // Set the text color to white
@@ -98,7 +98,7 @@ class DisplayPictureScreen extends StatelessWidget {
                 )),
       );
     } catch (e) {
-      print('Error saving image and navigating: $e');
+      log('Error saving image and navigating: $e');
     }
   }
 }

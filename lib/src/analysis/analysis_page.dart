@@ -1,19 +1,20 @@
 library analysis_page;
+
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:photo_coach/src/history.dart';
 import 'dart:io';
 import 'package:photo_coach/src/home_page/home_page.dart';
 
-/// Converts a metric's raw numeric score into a verbal rating. 
-/// 
-/// Poor = [0, 0.3) 
+/// Converts a metric's raw numeric score into a verbal rating.
+///
+/// Poor = [0, 0.3)
 /// Fair = [0.3, 0.6)
 /// Good = [0.6, 0.8)
 /// Excellent = [0.8, 1.0]
 /// An invalid value returns "Error".
 String getRating(double score) {
-  if (score < 0.0 || score > 1.0){
+  if (score < 0.0 || score > 1.0) {
     return 'Error';
   } else if (score < 0.3) {
     return 'Poor';
@@ -29,15 +30,15 @@ String getRating(double score) {
 }
 
 /// Converts a metric's raw numeric score into an associated color value ([0,1] -> [red,green])
-/// to appropriately color the rating on the _MetricBar.
-/// 
-/// red = [0, 0.3) 
+/// to appropriately color the rating on the [MetricBar].
+///
+/// red = [0, 0.3)
 /// yellow = [0.3, 0.6)
 /// light green = [0.6, 0.8)
 /// green = [0.8, 1.0]
 /// An invalid value returns black.
 Color getColor(double score) {
-  if (score < 0.0 || score > 1.0){
+  if (score < 0.0 || score > 1.0) {
     return Colors.black; // Error
   } else if (score < 0.3) {
     return Colors.red; // Poor
@@ -48,42 +49,50 @@ Color getColor(double score) {
   } else if (score <= 1.0) {
     return Colors.green; // Excellent
   } else {
-    return Colors.black; // Should not be possible, but removes the non-null return warning
+    return Colors
+        .black; // Should not be possible, but removes the non-null return warning
   }
 }
 
-/// The AnalysisPage Widget renders a page to display the contents of the [analysis] to the user.
+/// The AnalysisPage widget renders a page to display the contents of the [analysis] to the user.
 class AnalysisPage extends StatelessWidget {
+  /// The path on disk of the analyzed image.
   final String imgPath;
+
+  /// The analysis data for the image
   final Map<String, dynamic> analysis;
+
+  /// The index in the [History] on disk that the current result is stored.
   final int historyIndex;
 
+  /// Constructs the [AnalysisPage] and sets the [imgPath], [analysis], and [historyIndex].
   const AnalysisPage(
       {super.key,
       required this.imgPath,
       required this.analysis,
       required this.historyIndex});
-  
-  /// _addMetrics simplifies the readability of the [AnalysisPage.build] function.
-  /// It creates three [_MetricBar]s for the CLIPiqa evaluation and a textbox for the GPT-4 feedback.
-  Widget _addMetrics(Map<String, dynamic> analysis) {
+
+  /// [addMetrics] creates three [MetricBar]s for the CLIPiqa evaluation and a textbox for the GPT-4 feedback.
+  ///
+  /// This function is called by the [AnalysisPage.build] function to display the [MetricBar]s and GPT-4 feedback textbox in the UI.
+  Widget addMetrics(Map<String, dynamic> analysis) {
     log(analysis.toString());
     return ListView(
         primary: false,
         shrinkWrap: true,
         padding: const EdgeInsets.all(4),
         children: <Widget>[
-          _MetricBar(
+          MetricBar(
               title: "Overall Quality: ",
               rating: analysis["clip_result"]["quality"],
               explanation:
                   "Overall quality refers to the composition and clarity of the photo. It can be improved by using composition techniques like \"The Rule of Thirds\" (Placing the focus of your image on an intersection of the gridlines)"),
-          _MetricBar(
+          MetricBar(
               title: "Brightness: ",
               rating: analysis["clip_result"]["brightness"],
               explanation:
                   "Brightness refers to the amount of light in the photo. An adequate brightness level ensures that objects in the photo can be seen clearly."),
-          _MetricBar(
+          MetricBar(
               title: "Sharpness: ",
               rating: analysis["clip_result"]["sharpness"],
               explanation:
@@ -105,7 +114,9 @@ class AnalysisPage extends StatelessWidget {
                     fontSize: 20, // Adjust the font size as needed
                   ),
                 ),
-                const SizedBox(height: 8), // Adjust the spacing between "Feedback" and the GPT response
+                const SizedBox(
+                    height:
+                        8), // Adjust the spacing between "Feedback" and the GPT response
                 RichText(
                   text: TextSpan(
                     text: analysis['gpt_result'],
@@ -118,13 +129,13 @@ class AnalysisPage extends StatelessWidget {
               ],
             ),
           ),
-
         ]);
   }
 
-  /// The [_deleteIconButton] provides a way for users to call [History.remove] from the [AnalysisPage].
+  /// Deletes the current analysis results from the [History].
+  ///
   /// Tapping the button first displays an [AlertDialog] so the user can confirm that they want to delete the evaluation.
-  Widget _deleteIconButton(BuildContext context) {
+  Widget deleteIconButton(BuildContext context) {
     return IconButton(
         icon: const Icon(Icons.delete, color: Colors.red),
         onPressed: () async {
@@ -161,6 +172,7 @@ class AnalysisPage extends StatelessWidget {
         });
   }
 
+  /// Builds the widget to be displayed in the UI.
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -175,7 +187,7 @@ class AnalysisPage extends StatelessWidget {
                     (Route<dynamic> route) => false);
               },
             ),
-            actions: [_deleteIconButton(context)]),
+            actions: [deleteIconButton(context)]),
         body: Column(children: <Widget>[
           GestureDetector(
             child: SizedBox(
@@ -193,7 +205,7 @@ class AnalysisPage extends StatelessWidget {
           Expanded(
               child: SingleChildScrollView(
                   child: Column(children: [
-            _addMetrics(analysis),
+            addMetrics(analysis),
             const Divider(),
           ])))
         ]));
@@ -204,31 +216,39 @@ class AnalysisPage extends StatelessWidget {
 * "How would I go about making a page with an image at the top and different
   expandable textboxes in rows below that image?"
 * Generated 2/26/24 */
-/// The _MetricBar class renders a widget that displays the score/([rating]) and [explanation] of a single evaluation metric.
-/// Most of its functionality is housed in [_MetricBarState].
-/// 
-/// Future Consideration: It may no longer be necessary for _MetricBar to extend [StatefulWidget], as opposed to [StatelessWidget].
+
+/// The [MetricBar] widget renders a widget that displays the [rating] and [explanation] of a single evaluation metric.
+///
+/// Future Consideration: It may no longer be necessary for [MetricBar] to extend [StatefulWidget], as opposed to [StatelessWidget].
 /// The current extension is an artifact of trying to implement the [ExpansionTile]'s functionality before ExpansionTile was directly included.
-class _MetricBar extends StatefulWidget {
+class MetricBar extends StatefulWidget {
+  /// Title of the metric.
   final String title;
+
+  /// Rating for the metric.
   final double rating;
+
+  /// Explanation of what the metric is.
   final String explanation;
 
-  const _MetricBar(
-      {required this.title, required this.rating, required this.explanation});
+  /// Constructs a [MetricBar] and sets the [title], [rating], and [explanation].
+  const MetricBar(
+      {super.key,
+      required this.title,
+      required this.rating,
+      required this.explanation});
 
   @override
-  State<_MetricBar> createState() => _MetricBarState();
+  State<MetricBar> createState() => _MetricBarState();
 }
 
-/// 
-class _MetricBarState extends State<_MetricBar> {
-
+class _MetricBarState extends State<MetricBar> {
   @override
   void initState() {
     super.initState();
   }
 
+  /// Builds the widget to be displayed in the UI.
   @override
   Widget build(BuildContext context) {
     return ExpansionTile(
@@ -250,8 +270,7 @@ class _MetricBarState extends State<_MetricBar> {
           child: LayoutBuilder(
             builder: (context, constraints) =>
                 // Gradient bar & score marker
-              Stack(
-                  children: [
+                Stack(children: [
               Container(
                 height: double.infinity,
                 width: double.infinity,
@@ -274,7 +293,8 @@ class _MetricBarState extends State<_MetricBar> {
                         ])),
               ),
               Positioned(
-                left: constraints.maxWidth * widget.rating, // Position marker based on rating
+                left: constraints.maxWidth *
+                    widget.rating, // Position marker based on rating
                 child: Container(
                   width: 8, // Width of the marker
                   height: 8, // Height of the marker
@@ -294,7 +314,8 @@ class _MetricBarState extends State<_MetricBar> {
               text: TextSpan(
                 children: [
                   TextSpan(
-                    text: 'Score: ''${(widget.rating * 100).toStringAsFixed(2)}%',
+                    text: 'Score: '
+                        '${(widget.rating * 100).toStringAsFixed(2)}%',
                     style: const TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.bold,
@@ -309,17 +330,19 @@ class _MetricBarState extends State<_MetricBar> {
           ],
         ),
       ],
-
     );
   }
 }
 
-/// ImagePage provides the user with a full-screen view of the image displayed on the [AnalysisPage].
+/// The [ImagePage] widget renders a full-screen view of the image displayed on the [AnalysisPage] when the image is clicked on.
 class ImagePage extends StatelessWidget {
+  /// The path on disk of the image to display.
   final String imgPath;
 
+  /// Constructs the [ImagePage] and sets the [imgPath].
   const ImagePage({super.key, required this.imgPath});
 
+  /// Builds the widget to be displayed in the UI.
   @override
   Widget build(BuildContext context) {
     return Scaffold(
