@@ -53,6 +53,7 @@ class HomePageState extends State<HomePage> {
         height: 100.0,
         margin: const EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 20.0),
         child: ElevatedButton.icon(
+            key: const Key("upload_button"),
             icon: Image.asset("assets/images/photo_ico.png"),
             label: const Text("Upload Photo",
                 style: TextStyle(fontSize: 24.0, color: Colors.blue)),
@@ -73,6 +74,7 @@ class HomePageState extends State<HomePage> {
         height: 100.0,
         margin: const EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 20.0),
         child: ElevatedButton.icon(
+            key: const Key("camera_button"),
             icon: Image.asset("assets/images/camera_ico.png"),
             label: const Text("Take Photo",
                 style: TextStyle(fontSize: 24.0, color: Colors.blue)),
@@ -131,6 +133,7 @@ class HomePageState extends State<HomePage> {
         children: [
           for (int i = 0; i < history.length; i++)
             GestureDetector(
+                key: const Key("history_entry"),
                 child: Padding(
                     padding: const EdgeInsets.all(4.0),
                     child: Card(
@@ -165,6 +168,7 @@ class HomePageState extends State<HomePage> {
                         PopupMenuItem(
                             child: Center(
                                 child: TextButton(
+                                    key: const Key("delete_popup_button"),
                                     child: const Text("Delete",
                                         style: TextStyle(color: Colors.red)),
                                     onPressed: () async {

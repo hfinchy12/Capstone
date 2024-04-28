@@ -54,6 +54,7 @@ class DisplayPictureScreen extends StatelessWidget {
             ),
           ),
           ElevatedButton(
+            key: const Key("analyze_button"),
             onPressed: () {
               _saveAndNavigate(context);
             },

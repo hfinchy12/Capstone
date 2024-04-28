@@ -81,6 +81,7 @@ class CategoryButton extends StatelessWidget {
     final ThemeData theme = Theme.of(context);
 
     return TextButton(
+      key: Key(category),
       onPressed: () {
         Navigator.push(context, MaterialPageRoute(
           builder: (context) {

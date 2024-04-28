@@ -137,6 +137,7 @@ class AnalysisPage extends StatelessWidget {
   /// Tapping the button first displays an [AlertDialog] so the user can confirm that they want to delete the evaluation.
   Widget deleteIconButton(BuildContext context) {
     return IconButton(
+        key: const Key("delete_button"),
         icon: const Icon(Icons.delete, color: Colors.red),
         onPressed: () async {
           showDialog(
@@ -152,6 +153,7 @@ class AnalysisPage extends StatelessWidget {
                           onPressed: () => Navigator.pop(context),
                         ),
                         TextButton(
+                          key: const Key("delete_confirmation_button"),
                           child: const Text("Delete",
                               style: TextStyle(color: Colors.red)),
                           onPressed: () async {
@@ -179,6 +181,7 @@ class AnalysisPage extends StatelessWidget {
         appBar: AppBar(
             title: const Text('Analysis Results'),
             leading: IconButton(
+              key: const Key("home_button"),
               icon: const Icon(Icons.home),
               onPressed: () {
                 Navigator.pushAndRemoveUntil(
@@ -190,6 +193,7 @@ class AnalysisPage extends StatelessWidget {
             actions: [deleteIconButton(context)]),
         body: Column(children: <Widget>[
           GestureDetector(
+            key: const Key("image_preview"),
             child: SizedBox(
                 height: 200,
                 child: Card(
@@ -252,6 +256,7 @@ class _MetricBarState extends State<MetricBar> {
   @override
   Widget build(BuildContext context) {
     return ExpansionTile(
+      key: Key(widget.title),
       // RichText structure adapted from https://stackoverflow.com/a/55778274
       title: RichText(
         text: TextSpan(
@@ -347,6 +352,7 @@ class ImagePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: GestureDetector(
+        key: const Key("big_preview"),
         child: Center(
           child: Hero(tag: 'imageHero', child: Image.file(File(imgPath))),
         ),

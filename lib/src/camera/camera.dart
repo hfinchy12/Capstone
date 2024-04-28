@@ -1,4 +1,5 @@
 library camera;
+
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'dart:io';
@@ -48,28 +49,28 @@ class _CameraPageState extends State<CameraPage> {
   void _startSensorStream() {
     _subscription = accelerometerEvents.listen((AccelerometerEvent event) {
       setState(() {
-      double x = event.x;
-      double y = event.y;
+        double x = event.x;
+        double y = event.y;
 
-      // Calculate the tilt angle relative to the horizon
-      double angle = -math.atan2(y, x);
+        // Calculate the tilt angle relative to the horizon
+        double angle = -math.atan2(y, x);
 
-      // Adjust angle based on device orientation and invert the tilt for the leveling bar
-      angle += math.pi / 2; // Add pi/2 to invert the tilt direction
-      if (_previousAngle == -999) {
-        _previousAngle = angle;
-      }
-      double filteredAngle =
-          _previousAngle * 0.1 + angle * 0.90; //low-pass filtering.
-      _previousAngle = filteredAngle;
-      // Update leveling color based on the adjusted angle
-      _updateLevelingColor(angle);
+        // Adjust angle based on device orientation and invert the tilt for the leveling bar
+        angle += math.pi / 2; // Add pi/2 to invert the tilt direction
+        if (_previousAngle == -999) {
+          _previousAngle = angle;
+        }
+        double filteredAngle =
+            _previousAngle * 0.1 + angle * 0.90; //low-pass filtering.
+        _previousAngle = filteredAngle;
+        // Update leveling color based on the adjusted angle
+        _updateLevelingColor(angle);
 
-      setState(() {
-        _rotationAngle = filteredAngle;
-        _updateLevelingColor(
-            _rotationAngle); // Update based on filtered angle
-      });
+        setState(() {
+          _rotationAngle = filteredAngle;
+          _updateLevelingColor(
+              _rotationAngle); // Update based on filtered angle
+        });
       });
     });
   }
@@ -87,7 +88,7 @@ class _CameraPageState extends State<CameraPage> {
     if (angle.abs() < math.pi / 60) {
       _levelingColor = Colors.green; // Portrait orientation
     } else if ((angle.abs() > math.pi / 2 - math.pi / 60 &&
-        angle.abs() < math.pi / 2 + math.pi / 120) ||
+            angle.abs() < math.pi / 2 + math.pi / 120) ||
         (angle.abs() > -math.pi / 2 - math.pi / 120 &&
             angle.abs() < -math.pi / 2 + math.pi / 60)) {
       _levelingColor = Colors.green; // Landscape orientation (within 3 degrees)
@@ -139,7 +140,7 @@ class _CameraPageState extends State<CameraPage> {
       // Set popup title and content for 'selfie' category
       popupTitle = 'Selfie Tips';
       popupContent =
-      "Good Lighting: Natural light is often the most flattering. Avoid harsh overhead lighting or direct sunlight.\n\n"
+          "Good Lighting: Natural light is often the most flattering. Avoid harsh overhead lighting or direct sunlight.\n\n"
           "Angle: Typically, holding the camera slightly above eye level and angling your face slightly can help accentuate your features.\n\n"
           "Expression: Smile naturally or convey the mood you want to express in the selfie.\n\n"
           "Framing: Center yourself in the frame or use the rule of thirds to create a visually pleasing composition.";
@@ -147,7 +148,7 @@ class _CameraPageState extends State<CameraPage> {
       // Set popup title and content for 'landscapes' category
       popupTitle = 'Landscape Tips';
       popupContent =
-      "Use Leading Lines: Incorporate leading lines like roads, rivers, or fences to draw the viewer's eye into the scene.\n\n"
+          "Use Leading Lines: Incorporate leading lines like roads, rivers, or fences to draw the viewer's eye into the scene.\n\n"
           "Golden Hour: Shoot during the golden hour (early morning or late afternoon) for warm, soft lighting.\n\n"
           "Foreground Interest: Include interesting foreground elements to add depth and context to your landscape.\n\n"
           "Rule of Thirds: Use the rule of thirds to compose your shot, placing key elements along the grid lines or intersections.";
@@ -155,7 +156,7 @@ class _CameraPageState extends State<CameraPage> {
       // Set popup title and content for 'close-up' category
       popupTitle = 'Close-Up Tips';
       popupContent =
-      "Focus on Details: Get close to capture intricate details of your subject.\n\n"
+          "Focus on Details: Get close to capture intricate details of your subject.\n\n"
           "Experiment: Try different angles and perspectives to find unique shots.\n\n"
           "Lighting: Soft, diffused light works best for close-ups to avoid harsh shadows.\n\n"
           "Stability: Grip all four corners of your phone to stabilize your hands for sharp close-up shots.";
@@ -163,7 +164,7 @@ class _CameraPageState extends State<CameraPage> {
       // Set popup title and content for 'general' category
       popupTitle = 'General Photography Tips';
       popupContent =
-      "Composition: Follow the rule of thirds and use leading lines for interesting compositions.\n\n"
+          "Composition: Follow the rule of thirds and use leading lines for interesting compositions.\n\n"
           "Lighting: Understand natural light and use it to enhance your photos.\n\n"
           "Experiment: Try different angles and perspectives to find unique shots.\n\n"
           "Clean Backgrounds: Avoid cluttered backgrounds to keep the focus on your subject.";
@@ -184,6 +185,7 @@ class _CameraPageState extends State<CameraPage> {
         ),
         actions: [
           TextButton(
+            key: const Key("close_tips_button"),
             onPressed: () {
               Navigator.of(context).pop();
             },
@@ -255,8 +257,7 @@ class _CameraPageState extends State<CameraPage> {
       _showFocusIndicator = true; // Show the focus indicator after delay
     });
 
-    await Future.delayed(
-        Duration(milliseconds: 500));
+    await Future.delayed(Duration(milliseconds: 500));
     setState(() {
       _showFocusIndicator =
           false; // Hide the focus indicator after a certain duration
@@ -310,10 +311,12 @@ class _CameraPageState extends State<CameraPage> {
       appBar: AppBar(
         actions: [
           IconButton(
+            key: const Key("tips_button"),
             onPressed: _showPopup,
             icon: Icon(Icons.info),
           ),
           IconButton(
+            key: const Key("flip_camera_button"),
             onPressed: () {
               _toggleCamera();
               // Function to flip camera
@@ -321,21 +324,22 @@ class _CameraPageState extends State<CameraPage> {
             icon: Icon(Icons.flip_camera_ios_rounded),
           ),
           IconButton(
+            key: const Key("grid_button"),
             onPressed: () {
               setState(() {
                 _showGrid = !_showGrid; // Toggle grid visibility
                 _gridKey = UniqueKey(); // Update key to rebuild CustomPaint
               });
             },
-            icon: _showGrid
-                ? Icon(Icons.grid_on)
-                : Icon(Icons.grid_off),
+            icon: _showGrid ? Icon(Icons.grid_on) : Icon(Icons.grid_off),
           ),
           IconButton(
+            key: const Key("leveling_bar_button"),
             onPressed: _toggleLevelingBar,
             icon: Icon(Icons.screen_rotation_outlined),
           ),
           IconButton(
+            key: const Key("flash_button"),
             onPressed: () async {
               final controller = await _controllerFuture;
 
@@ -348,7 +352,8 @@ class _CameraPageState extends State<CameraPage> {
                     _flashMode = FlashMode.auto;
                     break;
                   case FlashMode.auto:
-                    _flashMode = FlashMode.off; // Change to 'off' instead of 'on'
+                    _flashMode =
+                        FlashMode.off; // Change to 'off' instead of 'on'
                     break;
                   default:
                     _flashMode = FlashMode.off;
@@ -402,7 +407,10 @@ class _CameraPageState extends State<CameraPage> {
                   child: Visibility(
                     visible: _showLevelingBar,
                     child: Transform.rotate(
-                      angle: _rotationAngle > (math.pi / 3) || _rotationAngle < -(math.pi / 3) ? math.pi / 2 : 0,
+                      angle: _rotationAngle > (math.pi / 3) ||
+                              _rotationAngle < -(math.pi / 3)
+                          ? math.pi / 2
+                          : 0,
                       child: Container(
                         height: 10,
                         width: double.infinity,
@@ -411,7 +419,6 @@ class _CameraPageState extends State<CameraPage> {
                     ),
                   ),
                 ),
-
                 Positioned(
                   left: 0,
                   right: 0,
@@ -448,8 +455,10 @@ class _CameraPageState extends State<CameraPage> {
                     _handleTapToFocus(details.localPosition, controller);
                   },
                   onScaleUpdate: (ScaleUpdateDetails details) {
-                    double zoomInScaleIncrement = 0.015; // Adjust this value for zoom in sensitivity
-                    double zoomOutScaleIncrement = 0.015; // Adjust this value for zoom out sensitivity
+                    double zoomInScaleIncrement =
+                        0.015; // Adjust this value for zoom in sensitivity
+                    double zoomOutScaleIncrement =
+                        0.015; // Adjust this value for zoom out sensitivity
 
                     double newZoom = _currentZoom * details.scale;
 
@@ -461,7 +470,8 @@ class _CameraPageState extends State<CameraPage> {
                     }
 
                     setState(() {
-                      _currentZoom = newZoom.clamp(1.0, _maxZoom); // Clamp zoom within limits
+                      _currentZoom = newZoom.clamp(
+                          1.0, _maxZoom); // Clamp zoom within limits
                       _updateZoom(controller, _currentZoom);
                     });
                   },
@@ -471,14 +481,15 @@ class _CameraPageState extends State<CameraPage> {
                     });
                   },
                   onScaleEnd: (ScaleEndDetails details) {
-
                     Future.delayed(Duration(milliseconds: 500), () {
                       setState(() {
-                        _isZooming = false; // Keep the zoom text visible for 200 milliseconds after the gesture ends
+                        _isZooming =
+                            false; // Keep the zoom text visible for 200 milliseconds after the gesture ends
                       });
                     });
                   },
-                  behavior: HitTestBehavior.opaque, // Ensure gesture detector handles taps and scales independently
+                  behavior: HitTestBehavior
+                      .opaque, // Ensure gesture detector handles taps and scales independently
                 ),
               ],
             );
@@ -491,6 +502,7 @@ class _CameraPageState extends State<CameraPage> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton(
+        key: const Key("take_picture_button"),
         onPressed: () async {
           final controller = await _controllerFuture;
           await takePicture(controller);
@@ -518,7 +530,11 @@ class _CameraPageState extends State<CameraPage> {
       if (pictureFile != null) {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => DisplayPictureScreen(imagePath: pictureFile.path, category: widget.category, lensDirection: controller.description.lensDirection)),
+          MaterialPageRoute(
+              builder: (context) => DisplayPictureScreen(
+                  imagePath: pictureFile.path,
+                  category: widget.category,
+                  lensDirection: controller.description.lensDirection)),
         );
         // Turn off the flash after capturing the photo
         await controller.setFlashMode(FlashMode.off);
@@ -537,7 +553,10 @@ class _CameraPageState extends State<CameraPage> {
     controller.setZoomLevel(zoomValue);
     setState(() {
       _currentZoom = zoomValue;
-      _zoomPercentage = (_currentZoom / _maxZoom * 100).clamp(0, 100).toInt().toDouble(); // Update zoom percentage calculation
+      _zoomPercentage = (_currentZoom / _maxZoom * 100)
+          .clamp(0, 100)
+          .toInt()
+          .toDouble(); // Update zoom percentage calculation
     });
   }
 }
