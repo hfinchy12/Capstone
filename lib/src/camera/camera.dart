@@ -10,15 +10,18 @@ import 'package:path_provider/path_provider.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'dart:math' as math; // Import math library for rotation calculations
 
+///The [camera] contains the full implementation for the camera screen.
 class CameraPage extends StatefulWidget {
   final String category; // Add category parameter
 
+  ///Constructs the CameraPage storing category information from [category_page]
   const CameraPage({Key? key, required this.category}) : super(key: key);
 
   @override
   _CameraPageState createState() => _CameraPageState();
 }
 
+///Stores state information for the all the buttons and the camera page in general
 class _CameraPageState extends State<CameraPage> {
   late Future<CameraController> _controllerFuture;
   Offset?
@@ -38,6 +41,7 @@ class _CameraPageState extends State<CameraPage> {
   double _previousAngle = -999;
   late Color _levelingColor = Colors.green; // Initially set to green
 
+  ///Initializing the camera screen
   @override
   void initState() {
     super.initState();
@@ -46,6 +50,9 @@ class _CameraPageState extends State<CameraPage> {
     _showLevelingBar = false; // Set leveling bar off by default
   }
 
+  ///Reads in the phone's accelerometer data and calculates the current angle
+  ///
+  ///Applies minor smoothing to the angle and updates the leveling bar's position
   void _startSensorStream() {
     _subscription = accelerometerEvents.listen((AccelerometerEvent event) {
       setState(() {
@@ -74,7 +81,9 @@ class _CameraPageState extends State<CameraPage> {
       });
     });
   }
-
+  ///Changes the color of the leveling bar between green and red depending on its position
+  ///
+  ///The leveling bar has a 3-degree leeway.
   void _updateLevelingColor(double angle) {
     // Adjust angle to be between -pi/2 to pi/2 (equivalent to -90 to 90 degrees)
     angle %= (2 * math.pi);
@@ -96,13 +105,14 @@ class _CameraPageState extends State<CameraPage> {
       _levelingColor = Colors.red; // Other orientations
     }
   }
-
   @override
   void dispose() {
     _subscription.cancel(); // Important: Cancel subscription
     super.dispose();
   }
-
+  ///Selects the phone's camera based off the category selected (front or back facing)
+  ///
+  /// Retrieves information about the camera such as max resolution and zoom capabilities
   Future<CameraController> initializeCamera() async {
     final cameras = await availableCameras();
     CameraDescription selectedCamera;
@@ -130,6 +140,7 @@ class _CameraPageState extends State<CameraPage> {
     return controller;
   }
 
+  ///The functionality for the pop-up button feature. Displays tips depending on the category from [category_page]
   Future<void> _showPopup() async {
     final PageController _pageController = PageController();
     String popupTitle = '';
@@ -196,6 +207,7 @@ class _CameraPageState extends State<CameraPage> {
     );
   }
 
+  ///Function that flips the camera between front and back facing whenever the flip-camera button is pressed.
   void _toggleCamera() async {
     final controller = await _controllerFuture;
     CameraLensDirection newDirection =
@@ -226,13 +238,13 @@ class _CameraPageState extends State<CameraPage> {
 
   bool _showLevelingBar = false; // Track the visibility of the leveling bar
 
-  // Method to toggle the visibility of the leveling bar
+  /// Method to toggle the visibility of the leveling bar
   void _toggleLevelingBar() {
     setState(() {
       _showLevelingBar = !_showLevelingBar;
     });
   }
-
+  ///Function to set the focus point for tap-to-focus
   Future<void> setFocusPoint(Offset point, CameraController controller) async {
     try {
       await controller.lockCaptureOrientation();
@@ -242,7 +254,9 @@ class _CameraPageState extends State<CameraPage> {
       print('Error setting focus point: $e');
     }
   }
-
+  ///Function to handle the exact position on the screen to direct the focus.
+  ///
+  ///The tap-to-focus indicator lasts 1/2 second
   void _handleTapToFocus(
       Offset tapPosition, CameraController controller) async {
     final double x = tapPosition.dx / MediaQuery.of(context).size.width;
@@ -263,7 +277,7 @@ class _CameraPageState extends State<CameraPage> {
           false; // Hide the focus indicator after a certain duration
     });
   }
-
+  ///The tap-to-focus widget that provides visual feedback to a user when pressing somewhere on the screen
   Widget _buildFocusIndicator() {
     return _showFocusIndicator && _focusIndicatorPosition != null
         ? Positioned(
@@ -281,6 +295,7 @@ class _CameraPageState extends State<CameraPage> {
         : SizedBox.shrink();
   }
 
+  ///Widget to display the current zoom level to a user after pinching in or outwards.
   Widget _buildZoomPercentageIndicator() {
     return Visibility(
       visible: _isZooming, // Show indicator only when zoom gesture is active
@@ -304,7 +319,7 @@ class _CameraPageState extends State<CameraPage> {
       ),
     );
   }
-
+  ///Appbar and of its contents
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -517,7 +532,9 @@ class _CameraPageState extends State<CameraPage> {
       ),
     );
   }
-
+  ///Function to capture an image with the camera.
+  ///
+  /// The image's path is stored and the image is sent to [display_picture_screen] for approval.
   Future<void> takePicture(CameraController controller) async {
     try {
       if (!controller.value.isInitialized) {
@@ -548,7 +565,7 @@ class _CameraPageState extends State<CameraPage> {
       print(e);
     }
   }
-
+  ///State controller for the pinch-to-zoom feature. Updates the zoom level based off user input
   void _updateZoom(CameraController controller, double zoomValue) {
     controller.setZoomLevel(zoomValue);
     setState(() {
@@ -560,7 +577,7 @@ class _CameraPageState extends State<CameraPage> {
     });
   }
 }
-
+///Class to create the grid overlay that appears over the camera screen when the grid button is pressed
 class GridPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {

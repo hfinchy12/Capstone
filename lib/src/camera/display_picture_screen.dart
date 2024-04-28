@@ -8,7 +8,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:photo_coach/src/analysis/api_caller.dart';
 import 'package:camera/camera.dart';
 import 'package:uuid/uuid.dart';
-
+///The [display_picture_screen] allows the user to view the image taken before sending it to the [api_caller]
 class DisplayPictureScreen extends StatelessWidget {
   final String imagePath;
   final String category;
@@ -20,6 +20,7 @@ class DisplayPictureScreen extends StatelessWidget {
       required this.category,
       required this.lensDirection});
 
+  ///Appbar containing a back button and a button to analyze the photo that was taken.
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -72,12 +73,12 @@ class DisplayPictureScreen extends StatelessWidget {
       ),
     );
   }
-
+  ///Function to retrieve the image file from [camera]
   Future<File> getFile(String imagePath) async {
     final file = File(imagePath);
     return file;
   }
-
+  ///Function to send the image file to the [api_caller] after the "analyze photo" button is pressed.
   Future<void> _saveAndNavigate(BuildContext context) async {
     try {
       final Directory appDocDir = await getApplicationDocumentsDirectory();
