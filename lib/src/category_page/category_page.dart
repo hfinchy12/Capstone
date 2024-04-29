@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:photo_coach/src/analysis/api_caller.dart';
 import 'package:photo_coach/src/camera/camera.dart';
 
+/// Provides an interface for the user to indicate the type of photo they are providing.
+/// 
+/// Navigates to either the [APICaller] or [CameraPage] based on the value of [fromUpload].
 class CategoryPage extends StatelessWidget {
   const CategoryPage(
       {super.key, this.fromUpload = false, this.uploadImagePath = ""});
@@ -61,6 +64,9 @@ class CategoryPage extends StatelessWidget {
   }
 }
 
+/// Renders a single category option for the user to choose from as a button with a label and icon.
+/// 
+/// Navigates to the next page when tapped, passing along its [category] to be sent to the backend with the image.
 class CategoryButton extends StatelessWidget {
   final String label;
   final String imageAsset;

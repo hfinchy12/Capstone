@@ -9,7 +9,7 @@ import 'package:photo_coach/src/category_page/category_page.dart';
 import 'package:photo_coach/src/history.dart';
 import 'package:uuid/uuid.dart';
 
-/// The [HomePage] displays options for the user to upload or take a picture and view their evaluation [History].
+/// Displays options for the user to upload or take a picture and view their evaluation [History].
 class HomePage extends StatefulWidget {
   /// Title of the app
   final String appTitle;
@@ -21,7 +21,7 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => HomePageState();
 }
 
-/// The [HomePageState] class contains the functionality for the [HomePage] class.
+/// Contains the functionality for the [HomePage] class.
 class HomePageState extends State<HomePage> {
   /// Builds the widget to be displayed in the UI.
   @override
@@ -112,7 +112,7 @@ class HomePageState extends State<HomePage> {
     }
   }
 
-  /// Displays the user's history.
+  /// Displays the user's [History].
   Widget history() {
     return FutureBuilder(
         future: historyFuture(),

@@ -9,10 +9,10 @@ import 'package:flutter/material.dart';
 import 'package:photo_coach/src/analysis/analysis_page.dart';
 import 'package:photo_coach/src/history.dart';
 
-/// The [APICaller] widget sends the image stored at the [imgPath] and the image [category] to the backend server and waits for and handles the response.
+/// Sends the image stored at [imgPath] and the image [category] to the backend server, waits for, then handles the response.
 ///
 /// While awaiting the response from the backend, the widget displays a loading wheel and a sequence of tips.
-/// Once the backend responds, the [APICaller] constructs an [AnalysisPage] with the response.
+/// Once the backend responds, the APICaller constructs an [AnalysisPage] with the response.
 class APICaller extends StatefulWidget {
   /// The path on disk of the image.
   final String imgPath;
@@ -27,7 +27,7 @@ class APICaller extends StatefulWidget {
   State<APICaller> createState() => APICallerState();
 }
 
-/// The [APICallerState] class contains the functionality for the [APICaller] class.
+/// Contains the functionality for the [APICaller] class.
 class APICallerState extends State<APICaller> {
   /// The analysis response returned by the backend.
   late Future<Map<String, dynamic>> responseFuture;

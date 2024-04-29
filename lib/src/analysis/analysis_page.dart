@@ -54,7 +54,7 @@ Color getColor(double score) {
   }
 }
 
-/// The AnalysisPage widget renders a page to display the contents of the [analysis] to the user.
+/// Renders a page to display the contents of the [analysis] to the user.
 class AnalysisPage extends StatelessWidget {
   /// The path on disk of the analyzed image.
   final String imgPath;
@@ -72,7 +72,7 @@ class AnalysisPage extends StatelessWidget {
       required this.analysis,
       required this.historyIndex});
 
-  /// [addMetrics] creates three [MetricBar]s for the CLIPiqa evaluation and a textbox for the GPT-4 feedback.
+  /// Creates three [MetricBar]s for the CLIPiqa evaluation and a textbox for the GPT-4 feedback.
   ///
   /// This function is called by the [AnalysisPage.build] function to display the [MetricBar]s and GPT-4 feedback textbox in the UI.
   Widget addMetrics(Map<String, dynamic> analysis) {
@@ -220,10 +220,9 @@ class AnalysisPage extends StatelessWidget {
 * "How would I go about making a page with an image at the top and different
   expandable textboxes in rows below that image?"
 * Generated 2/26/24 */
-
-/// The [MetricBar] widget renders a widget that displays the [rating] and [explanation] of a single evaluation metric.
+/// Renders a widget that displays the [rating] and [explanation] of a single evaluation metric.
 ///
-/// Future Consideration: It may no longer be necessary for [MetricBar] to extend [StatefulWidget], as opposed to [StatelessWidget].
+/// Future Consideration: It may no longer be necessary for MetricBar to extend [StatefulWidget], as opposed to [StatelessWidget].
 /// The current extension is an artifact of trying to implement the [ExpansionTile]'s functionality before ExpansionTile was directly included.
 class MetricBar extends StatefulWidget {
   /// Title of the metric.
@@ -232,7 +231,7 @@ class MetricBar extends StatefulWidget {
   /// Rating for the metric.
   final double rating;
 
-  /// Explanation of what the metric is.
+  /// Explanation of what the metric evaluates and how to improve its rating.
   final String explanation;
 
   /// Constructs a [MetricBar] and sets the [title], [rating], and [explanation].
@@ -339,7 +338,7 @@ class _MetricBarState extends State<MetricBar> {
   }
 }
 
-/// The [ImagePage] widget renders a full-screen view of the image displayed on the [AnalysisPage] when the image is clicked on.
+/// Renders a full-screen view of the image displayed on the [AnalysisPage] when the image is clicked on.
 class ImagePage extends StatelessWidget {
   /// The path on disk of the image to display.
   final String imgPath;
